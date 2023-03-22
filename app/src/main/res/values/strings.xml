@@ -8,4 +8,5 @@
     <string name="navigate_create_tab_description">An icon of a camera</string>
     <string name="navigate_play_tab_description">An icon of a map</string>
     <string name="navigate_ranking_tab_description">An icon of a badge</string>
+    <string name="guess_button_text">Guess Here</string>
 </resources>
