@@ -8,7 +8,7 @@
 
     <ImageButton
         android:id="@+id/imageButton"
-        style="@style/score_view_style"
+        style="@style/image_view_style"
         tools:text="placeholder text"
         app:srcCompat="@drawable/temp_img"
         android:contentDescription="Recent Activity" />
