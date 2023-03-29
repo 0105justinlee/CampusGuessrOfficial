@@ -30,27 +30,23 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
-import com.google.android.gms.tasks.CancellationToken;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 
 import java.io.File;
 
 
-//saus: https://codelabs.developers.google.com/codelabs/camerax-getting-started/
+//source: https://codelabs.developers.google.com/codelabs/camerax-getting-started/
 
 public class CameraCapture extends AppCompatActivity {
 
     private int REQUEST_CODE_PERMISSIONS = 10; //arbitrary number, can be changed accordingly
-    //private final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA","android.permission.READ_EXTERNAL_STORAGE"
-    //        ,"android.permission.WRITE_EXTERNAL_STORAGE" ,"android.permission.MANAGE_EXTERNAL_STORAGE"
-    //        ,"android.permission.READ_EXTERNAL_STORAGE"}; //array w/ permissions from manifest
     private final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA"
             , "android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION"};
     private FusedLocationProviderClient fusedLocationClient;
-    private String coords;
+    private String currentCoords;
+    private String lastCoords;
     TextureView txView;
     TextView location_text;
 
@@ -62,6 +58,8 @@ public class CameraCapture extends AppCompatActivity {
         txView = findViewById(R.id.view_finder);
         location_text = (TextView) findViewById(R.id.location);
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
         if (allPermissionsGranted()) {
             startCamera(); //start camera if permission has been granted by user
         } else {
@@ -70,6 +68,9 @@ public class CameraCapture extends AppCompatActivity {
     }
 
     private void startCamera() {
+        // need to call getLocation() once in order for FusedLocationClient
+        // to be ready the getLocation() call in onClick()
+        getLocation();
         //make sure there isn't another camera instance running before starting
         CameraX.unbindAll();
 
@@ -107,10 +108,13 @@ public class CameraCapture extends AppCompatActivity {
         findViewById(R.id.capture_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // location capture
-                String locationCoord = getLocation();
+                //location capture
+                getLocation();
+                String locationCoord = currentCoords;
                 if (locationCoord != null) {
                     location_text.setText("Location: " + locationCoord);
+                } else {
+                    location_text.setText("Location: NULL");
                 }
 
                 // image capture
@@ -143,7 +147,7 @@ public class CameraCapture extends AppCompatActivity {
                 new ImageAnalysis.Analyzer() {
                     @Override
                     public void analyze(ImageProxy image, int rotationDegrees) {
-                        //y'all can add code to analyse stuff here idek go wild.
+                        // analyze code here
                     }
                 });
 
@@ -154,7 +158,6 @@ public class CameraCapture extends AppCompatActivity {
     private void updateTransform() {
         /*
          * compensates the changes in orientation for the viewfinder, bc the rest of the layout stays in portrait mode.
-         * methinks :thonk:
          * imgCap does this already, this class can be commented out or be used to optimise the preview
          */
         Matrix mx = new Matrix();
@@ -212,7 +215,7 @@ public class CameraCapture extends AppCompatActivity {
         return true;
     }
 
-    private String getLocation() {
+    private void getLocation() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -221,17 +224,27 @@ public class CameraCapture extends AppCompatActivity {
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
-            return null;
+            return;
         }
+        // Note: getCurrentLocation is a more accurate method of retrieving location
+        //fusedLocationClient.getLastLocation()
+        //        .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+        //            @Override
+        //            public void onSuccess(Location location) {
+        //                if (location != null) {
+        //                    lastCoords = Double.toString(location.getLatitude()) + ", " + Double.toString(location.getLongitude());
+        //                }
+        //            }
+        //        });
         fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
                 .addOnSuccessListener(CameraCapture.this, new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
                         if (location != null) {
-                            coords = Double.toString(location.getLatitude()) + " " + Double.toString(location.getLongitude());
+                            currentCoords = Double.toString(location.getLatitude()) + ", " + Double.toString(location.getLongitude());
                         }
                     }
                 });
-        return coords;
+        return;
     }
 }
