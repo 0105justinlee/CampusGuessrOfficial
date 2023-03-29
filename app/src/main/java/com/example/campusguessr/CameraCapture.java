@@ -48,7 +48,7 @@ public class CameraCapture extends AppCompatActivity {
     private String currentCoords;
     private String lastCoords;
     TextureView txView;
-    TextView location_text;
+    TextView locationText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +56,7 @@ public class CameraCapture extends AppCompatActivity {
         setContentView(R.layout.camera_capture);
 
         txView = findViewById(R.id.view_finder);
-        location_text = (TextView) findViewById(R.id.location);
+        locationText = (TextView) findViewById(R.id.location);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -112,9 +112,9 @@ public class CameraCapture extends AppCompatActivity {
                 getLocation();
                 String locationCoord = currentCoords;
                 if (locationCoord != null) {
-                    location_text.setText("Location: " + locationCoord);
+                    locationText.setText("Location: " + locationCoord);
                 } else {
-                    location_text.setText("Location: NULL");
+                    locationText.setText("Location: NULL");
                 }
 
                 // image capture
