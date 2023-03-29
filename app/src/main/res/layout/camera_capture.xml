@@ -18,7 +18,7 @@
             android:layout_height="538dp" />
 
         <TextView
-            android:id="@+id/location"
+            android:id="@+id/locationCapText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Location"
@@ -28,13 +28,13 @@
             android:layout_centerHorizontal="true"/>
 
         <TextView
-            android:id="@+id/orientation"
+            android:id="@+id/orientationCapText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Orientation"
             tools:layout_editor_absoluteX="20dp"
             tools:layout_editor_absoluteY="473dp"
-            android:layout_below="@+id/location"
+            android:layout_below="@+id/locationCapText"
             android:layout_centerHorizontal="true"/>
 
         <ImageButton
@@ -44,7 +44,7 @@
             android:layout_margin="24dp"
             android:contentDescription="Capture"
             app:srcCompat="@android:drawable/ic_menu_camera"
-            android:layout_below="@+id/orientation"
+            android:layout_below="@+id/orientationCapText"
             android:layout_centerHorizontal="true"/>
     </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

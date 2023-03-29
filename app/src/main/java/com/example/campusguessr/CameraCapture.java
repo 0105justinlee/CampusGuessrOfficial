@@ -2,6 +2,10 @@ package com.example.campusguessr;
 
 import android.content.pm.PackageManager;
 import android.graphics.Matrix;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Environment;
@@ -39,7 +43,7 @@ import java.io.File;
 
 //source: https://codelabs.developers.google.com/codelabs/camerax-getting-started/
 
-public class CameraCapture extends AppCompatActivity {
+public class CameraCapture extends AppCompatActivity implements SensorEventListener {
 
     private int REQUEST_CODE_PERMISSIONS = 10; //arbitrary number, can be changed accordingly
     private final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA"
@@ -47,8 +51,13 @@ public class CameraCapture extends AppCompatActivity {
     private FusedLocationProviderClient fusedLocationClient;
     private String currentCoords;
     private String lastCoords;
+
+    private SensorManager sensorManager;
+    private SensorEvent acc_event;
+    private SensorEvent mag_event;
     TextureView txView;
     TextView locationText;
+    TextView orientationText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,9 +65,21 @@ public class CameraCapture extends AppCompatActivity {
         setContentView(R.layout.camera_capture);
 
         txView = findViewById(R.id.view_finder);
-        locationText = (TextView) findViewById(R.id.location);
+        locationText = findViewById(R.id.locationCapText);
+        orientationText = findViewById(R.id.orientationCapText);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        // set up listener for the accelerometer
+        sensorManager.registerListener(this,
+                sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                SensorManager.SENSOR_DELAY_NORMAL);
+
+        // set up listener for the magnetic field sensor
+        sensorManager.registerListener(this,
+                sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
+                SensorManager.SENSOR_DELAY_NORMAL);
 
         if (allPermissionsGranted()) {
             startCamera(); //start camera if permission has been granted by user
@@ -108,7 +129,7 @@ public class CameraCapture extends AppCompatActivity {
         findViewById(R.id.capture_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //location capture
+                // location capture
                 getLocation();
                 String locationCoord = currentCoords;
                 if (locationCoord != null) {
@@ -116,6 +137,15 @@ public class CameraCapture extends AppCompatActivity {
                 } else {
                     locationText.setText("Location: NULL");
                 }
+
+                // orientation capture
+                float[] orientationValues = new float[3];
+                float[] rotationMatrix = new float[9];
+                SensorManager.getRotationMatrix(rotationMatrix, null, acc_event.values, mag_event.values);
+                SensorManager.getOrientation(rotationMatrix,orientationValues);
+                String orientationString = "A: " + orientationValues[0] + " P: " + orientationValues[1]
+                        + "\nR: " + orientationValues[2];
+                orientationText.setText(orientationString);
 
                 // image capture
                 File file = new File(getFilesDir() + "/" + System.currentTimeMillis() + ".jpg");
@@ -241,10 +271,28 @@ public class CameraCapture extends AppCompatActivity {
                     @Override
                     public void onSuccess(Location location) {
                         if (location != null) {
-                            currentCoords = Double.toString(location.getLatitude()) + ", " + Double.toString(location.getLongitude());
+                            currentCoords = location.getLatitude() + ", " + location.getLongitude();
                         }
                     }
                 });
         return;
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        // set acc_event to the most recent accelerometer reading
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            acc_event = event;
+        }
+
+        // set mag_event to the most recent magnetic field reading
+        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+            mag_event = event;
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 }
