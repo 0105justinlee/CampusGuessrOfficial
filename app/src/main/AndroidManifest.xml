@@ -21,6 +21,15 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".RankingsActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.RANKINGSACTIVITY" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".StartChallengeActivity"
             android:exported="true">
             <intent-filter>

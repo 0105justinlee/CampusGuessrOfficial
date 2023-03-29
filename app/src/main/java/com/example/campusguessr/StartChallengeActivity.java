@@ -12,7 +12,14 @@ public class StartChallengeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.start_challenge);
+        ImageButton RankingsButton = (ImageButton) findViewById(R.id.navigate_ranking_tab_button);
         ImageButton ProfileButton = (ImageButton) findViewById(R.id.navigate_profile_tab_button);
+        RankingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), RankingsActivity.class));
+            }
+        });
         ProfileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
