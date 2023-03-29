@@ -45,6 +45,7 @@ import java.io.File;
 
 public class CameraCapture extends AppCompatActivity implements SensorEventListener {
 
+    // variables for location capturing
     private int REQUEST_CODE_PERMISSIONS = 10; //arbitrary number, can be changed accordingly
     private final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA"
             , "android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION"};
@@ -52,6 +53,7 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
     private String currentCoords;
     private String lastCoords;
 
+    // variables for orientation capturing
     private SensorManager sensorManager;
     private SensorEvent acc_event;
     private SensorEvent mag_event;
@@ -64,12 +66,16 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.camera_capture);
 
+        // initializing views
         txView = findViewById(R.id.view_finder);
         locationText = findViewById(R.id.locationCapText);
         orientationText = findViewById(R.id.orientationCapText);
 
+        // fusedLocationClient utilizes Google Play services location API
+        // for a more accurate and efficient location capturing
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        // initializing orientation capturing stuff
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         // set up listener for the accelerometer
         sensorManager.registerListener(this,
@@ -81,6 +87,7 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
                 sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
                 SensorManager.SENSOR_DELAY_NORMAL);
 
+        // must check that all permissions are granted before starting up the camera
         if (allPermissionsGranted()) {
             startCamera(); //start camera if permission has been granted by user
         } else {
@@ -90,7 +97,7 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
 
     private void startCamera() {
         // need to call getLocation() once in order for FusedLocationClient
-        // to be ready the getLocation() call in onClick()
+        // to be ready for the getLocation() call in onClick()
         getLocation();
         //make sure there isn't another camera instance running before starting
         CameraX.unbindAll();
@@ -129,7 +136,7 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
         findViewById(R.id.capture_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // location capture
+                /////// location capture ///////
                 getLocation();
                 String locationCoord = currentCoords;
                 if (locationCoord != null) {
@@ -138,16 +145,19 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
                     locationText.setText("Location: NULL");
                 }
 
-                // orientation capture
+                /////// orientation capture ///////
                 float[] orientationValues = new float[3];
                 float[] rotationMatrix = new float[9];
                 SensorManager.getRotationMatrix(rotationMatrix, null, acc_event.values, mag_event.values);
                 SensorManager.getOrientation(rotationMatrix,orientationValues);
+                // note: orientationValues[0] is azimuth, which is the "absolute heading of yaw"
+                // orientationValues[1] is pitch
+                // orientationValues[2] is roll
                 String orientationString = "A: " + orientationValues[0] + " P: " + orientationValues[1]
                         + "\nR: " + orientationValues[2];
                 orientationText.setText(orientationString);
 
-                // image capture
+                /////// image capture ///////
                 File file = new File(getFilesDir() + "/" + System.currentTimeMillis() + ".jpg");
                 imgCap.takePicture(file, new ImageCapture.OnImageSavedListener() {
                     @Override
@@ -247,13 +257,6 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
 
     private void getLocation() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         // Note: getCurrentLocation is a more accurate method of retrieving location
@@ -293,6 +296,6 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
+        // need this method because android studio will throw an error without it
     }
 }
