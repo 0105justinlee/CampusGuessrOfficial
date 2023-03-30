@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/settings_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="60dp"
+        android:text="Username:"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/settings_edittext_username"
+        android:layout_width="285dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/edittext_background"
+        android:hint="Enter username"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settings_username"></EditText>
+
+    <Button
+        android:id="@+id/settings_username_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="20dp"
+        android:text="Submit"
+        app:layout_constraintStart_toEndOf="@+id/settings_edittext_username"
+        app:layout_constraintTop_toBottomOf="@+id/settings_username" />
+
+    <TextView
+        android:id="@+id/settings_desiredDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="48dp"
+        android:text="Desired Distance: "
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settings_edittext_username" />
+
+    <SeekBar
+        android:id="@+id/settings_seekbar_desiredDistance"
+        android:layout_width="362dp"
+        android:layout_height="29dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="20dp"
+        android:max="100"
+        android:progress="50"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settings_desiredDistance" />
+
+    <TextView
+        android:id="@+id/settings_desiredDistance_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:text="Very Close"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settings_seekbar_desiredDistance" />
+
+    <TextView
+        android:id="@+id/settings_desiredDistance_far"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="244dp"
+        android:layout_marginTop="8dp"
+        android:text="Very Far"
+        app:layout_constraintStart_toEndOf="@+id/settings_desiredDistance_close"
+        app:layout_constraintTop_toBottomOf="@+id/settings_seekbar_desiredDistance" />
+
+    <TextView
+        android:id="@+id/settings_desiredDifficulty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="48dp"
+        android:text="Desired Difficulty:"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settings_seekbar_desiredDistance" />
+
+    <SeekBar
+        android:id="@+id/settings_seekbar_desiredDifficulty"
+        android:layout_width="362dp"
+        android:layout_height="29dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="20dp"
+        android:max="100"
+        android:progress="50"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settings_desiredDifficulty" />
+
+
+    <TextView
+        android:id="@+id/settings_desiredDifficulty_easy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="4dp"
+        android:text="Very Easy"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settings_seekbar_desiredDifficulty" />
+
+    <TextView
+        android:id="@+id/settings_desiredDifficulty_hard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="244dp"
+        android:layout_marginTop="4dp"
+        android:text="Very Hard"
+        app:layout_constraintStart_toEndOf="@+id/settings_desiredDifficulty_easy"
+        app:layout_constraintTop_toBottomOf="@+id/settings_seekbar_desiredDifficulty" />
+
+    <TextView
+        android:id="@+id/settings_colorblindOptions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="48dp"
+        android:text="Colorblind Options:"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settings_seekbar_desiredDifficulty" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/navigate_ranking_tab_button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:contentDescription="@string/navigate_ranking_tab_description"
+                app:srcCompat="@drawable/baseline_military_tech_24" />
+
+            <ImageButton
+                android:id="@+id/navigate_play_tab_button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:contentDescription="@string/navigate_play_tab_description"
+                app:srcCompat="@drawable/baseline_map_24" />
+
+            <ImageButton
+                android:id="@+id/navigate_create_tab_button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:contentDescription="@string/navigate_create_tab_description"
+                app:srcCompat="@drawable/baseline_photo_camera_24" />
+
+            <ImageButton
+                android:id="@+id/navigate_profile_tab_button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:contentDescription="@string/navigate_profile_tab_description"
+                app:srcCompat="@drawable/baseline_person_outline_24" />
+        </LinearLayout>
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

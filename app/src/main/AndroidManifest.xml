@@ -2,8 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.CAMERA"></uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"></uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
+
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -14,8 +18,48 @@
         <activity
             android:name=".MainActivity"
             android:exported="true">
+
+        </activity>
+        <activity android:name=".CameraCapture"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ChallengeActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.CHALLENGE" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".RankingsActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.RANKINGS" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".StartChallengeActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.STARTCHALLENGE" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.PROFILE" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>

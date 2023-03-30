@@ -1,4 +1,13 @@
 <resources>
     <string name="app_name">CampusGuessr</string>
+    <string name="distance">Distance:</string>
+    <string name="difficulty">Difficulty:</string>
+    <string name="start_button_text">Start Challenge</string>
+    <string name="reroll_button_text">Reroll (X rerolls remaining)</string>
+    <string name="navigate_profile_tab_description">An icon of a person</string>
+    <string name="navigate_create_tab_description">An icon of a camera</string>
+    <string name="navigate_play_tab_description">An icon of a map</string>
+    <string name="navigate_ranking_tab_description">An icon of a badge</string>
+    <string name="guess_button_text">Guess Here</string>
     <string name="log_out">Log out</string>
 </resources>

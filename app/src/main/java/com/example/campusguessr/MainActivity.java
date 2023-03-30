@@ -26,5 +26,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        startActivity(new Intent(this, GoogleSignInActivity.class));
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 }
