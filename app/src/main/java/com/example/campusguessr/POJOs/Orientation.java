@@ -4,7 +4,7 @@ import lombok.Value;
 
 @Value
 public class Orientation {
-    public Double x;
-    public Double y;
-    public Double z;
+    public Float x;
+    public Float y;
+    public Float z;
 }

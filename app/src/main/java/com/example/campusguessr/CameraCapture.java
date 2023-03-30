@@ -174,7 +174,8 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
                         intent.putExtra("photoPath", file.getAbsolutePath());
                         intent.putExtra("location", currentCoords);
                         intent.putExtra("orientation", orientationValues);
-                        startActivity(intent);
+                        setResult(RESULT_OK, intent);
+                        finish();
                     }
 
                     @Override

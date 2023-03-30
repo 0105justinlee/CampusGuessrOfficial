@@ -23,6 +23,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
 import java.net.URI;
 import java.util.Date;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class CreateChallengeActivity extends Activity {
     private final String TAG = "Create Challenge";
 
     private double[] location = new double[2];
-    private double[] orientation = new double[3];
+    private float[] orientation = new float[3];
     private String photoPath;
 
     private TextView titleText;
@@ -69,9 +70,9 @@ public class CreateChallengeActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         Bundle extras = intent.getExtras();
-        if (extras != null) {
+        if (resultCode == RESULT_OK) {
             location = extras.getDoubleArray("location");
-            orientation = extras.getDoubleArray("orientation");
+            orientation = extras.getFloatArray("orientation");
             photoPath = extras.getString("photoPath");
 
             locOriText.setText("Location: " + location[0] + ", " + location[1] + ", Orientation: " + orientation[0] + ", " + orientation[1] + ", " + orientation[2]);
@@ -82,7 +83,7 @@ public class CreateChallengeActivity extends Activity {
 
     public void CapturePhoto(View view) {
         Intent intent = new Intent(this, CameraCapture.class);
-        startActivity(intent);
+        startActivityForResult(intent, 0);
     }
 
     public void submit(View view) {
@@ -96,15 +97,22 @@ public class CreateChallengeActivity extends Activity {
         location.setLongitude(this.location[1]);
         c1.setLocation(location);
         c1.setOrientation(new Orientation(orientation[0], orientation[1], orientation[2]));
-        c1.setImageURL(photoPath);
 
-        StorageReference storageRef = storage.getReference("challenges/img0.jpeg");
-        UploadTask task = storageRef.putStream(getResources().openRawResource(R.raw.img0));
+        StorageReference storageRef = storage.getReference("challenges/" + c1.getId().toString() + ".jpg");
+        UploadTask task = storageRef.putFile(Uri.fromFile(new File(photoPath)));
         task.addOnSuccessListener(taskSnapshot -> {
             Toast.makeText(this, "Upload successful", Toast.LENGTH_SHORT).show();
             try {
-                Map c1Map = new ObjectMapper().convertValue(c1, Map.class);
-                mDatabase.child("challenges").child(c1.getId().toString()).setValue(c1Map);
+                storageRef.getDownloadUrl().onSuccessTask(uri -> {
+                    c1.setImageURL(uri.toString());
+                    Map c1Map = new ObjectMapper().convertValue(c1, Map.class);
+                    mDatabase.child("challenges").child(c1.getId().toString()).setValue(c1Map);
+                    return null;
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to upload challenge", Toast.LENGTH_SHORT).show();
+                    return;
+                });
             } catch (Exception e) {
                 Toast.makeText(this, "Failed to upload challenge", Toast.LENGTH_SHORT).show();
                 return;

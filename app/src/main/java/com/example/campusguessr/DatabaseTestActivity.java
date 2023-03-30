@@ -57,7 +57,7 @@ public class DatabaseTestActivity extends Activity {
         c1.setCreatedBy(mAuth.getCurrentUser().getUid());
         c1.setDescription("Example description");
         c1.setLocation(new Location(""));
-        c1.setOrientation(new Orientation(1.0, 2.0, 3.0));
+        c1.setOrientation(new Orientation(1.0f, 2.0f, 3.0f));
         c1.setName("Example Name");
         c1.setImageURL("");
 
