@@ -1,4 +1,4 @@
-package com.example.campusguessr.DataTypes;
+package com.example.campusguessr.POJOs;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

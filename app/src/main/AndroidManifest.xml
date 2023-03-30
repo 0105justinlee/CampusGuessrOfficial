@@ -21,6 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".GoogleSignInActivity"></activity>
+        <activity android:name=".DatabaseTestActivity"></activity>
     </application>
 
 </manifest>
