@@ -1,5 +1,6 @@
 package com.example.campusguessr;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Matrix;
 import android.hardware.Sensor;
@@ -50,8 +51,8 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
     private final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA"
             , "android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION"};
     private FusedLocationProviderClient fusedLocationClient;
-    private String currentCoords;
-    private String lastCoords;
+    private double[] currentCoords = new double[2];
+//    private String lastCoords;
 
     // variables for orientation capturing
     private SensorManager sensorManager;
@@ -60,6 +61,9 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
     TextureView txView;
     TextView locationText;
     TextView orientationText;
+
+    public CameraCapture() {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,7 +142,7 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
             public void onClick(View v) {
                 /////// location capture ///////
                 getLocation();
-                String locationCoord = currentCoords;
+                String locationCoord = currentCoords[0] + ", " + currentCoords[1];
                 if (locationCoord != null) {
                     locationText.setText("Location: " + locationCoord);
                 } else {
@@ -164,6 +168,13 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
                     public void onImageSaved(@NonNull File file) {
                         String msg = "Photo capture succeeded: " + file.getAbsolutePath();
                         Toast.makeText(getBaseContext(), msg, Toast.LENGTH_LONG).show();
+
+                        // pass the image, location data and orientation to the next activity
+                        Intent intent = new Intent(CameraCapture.this, CreateChallengeActivity.class);
+                        intent.putExtra("photoPath", file.getAbsolutePath());
+                        intent.putExtra("location", currentCoords);
+                        intent.putExtra("orientation", orientationValues);
+                        startActivity(intent);
                     }
 
                     @Override
@@ -274,7 +285,8 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
                     @Override
                     public void onSuccess(Location location) {
                         if (location != null) {
-                            currentCoords = location.getLatitude() + ", " + location.getLongitude();
+                            currentCoords[0] = location.getLatitude();
+                            currentCoords[1] = location.getLongitude();
                         }
                     }
                 });

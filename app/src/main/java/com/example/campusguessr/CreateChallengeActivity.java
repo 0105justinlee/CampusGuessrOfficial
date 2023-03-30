@@ -1,0 +1,118 @@
+package com.example.campusguessr;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.location.Location;
+import android.net.Uri;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultCallback;
+
+import com.example.campusguessr.POJOs.Challenge;
+import com.example.campusguessr.POJOs.Orientation;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.net.URI;
+import java.util.Date;
+import java.util.Map;
+import java.util.UUID;
+
+public class CreateChallengeActivity extends Activity {
+    private final String TAG = "Create Challenge";
+
+    private double[] location = new double[2];
+    private double[] orientation = new double[3];
+    private String photoPath;
+
+    private TextView titleText;
+    private TextView descriptionText;
+    private TextView locOriText;
+    private TextView photoPathText;
+    private ImageView photoView;
+    private FirebaseAuth mAuth;
+    private FirebaseStorage storage;
+
+    private DatabaseReference mDatabase;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.create_challenge);
+
+        titleText = findViewById(R.id.titleText);
+        descriptionText = findViewById(R.id.descriptionText);
+        locOriText = findViewById(R.id.locOriText);
+        photoPathText = findViewById(R.id.photoPathText);
+        photoView = findViewById(R.id.photoView);
+
+        mAuth = FirebaseAuth.getInstance();
+        storage = FirebaseStorage.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            location = extras.getDoubleArray("location");
+            orientation = extras.getDoubleArray("orientation");
+            photoPath = extras.getString("photoPath");
+
+            locOriText.setText("Location: " + location[0] + ", " + location[1] + ", Orientation: " + orientation[0] + ", " + orientation[1] + ", " + orientation[2]);
+            photoPathText.setText("Photo Path: " + photoPath);
+            photoView.setImageURI(Uri.parse(photoPath));
+        }
+    }
+
+    public void CapturePhoto(View view) {
+        Intent intent = new Intent(this, CameraCapture.class);
+        startActivity(intent);
+    }
+
+    public void submit(View view) {
+        Challenge c1 = new Challenge(UUID.randomUUID());
+        c1.setCreatedAt(new Date());
+        c1.setCreatedBy(mAuth.getCurrentUser().getUid());
+        c1.setName(titleText.getText().toString());
+        c1.setDescription(descriptionText.getText().toString());
+        Location location = new Location("");
+        location.setLatitude(this.location[0]);
+        location.setLongitude(this.location[1]);
+        c1.setLocation(location);
+        c1.setOrientation(new Orientation(orientation[0], orientation[1], orientation[2]));
+        c1.setImageURL(photoPath);
+
+        StorageReference storageRef = storage.getReference("challenges/img0.jpeg");
+        UploadTask task = storageRef.putStream(getResources().openRawResource(R.raw.img0));
+        task.addOnSuccessListener(taskSnapshot -> {
+            Toast.makeText(this, "Upload successful", Toast.LENGTH_SHORT).show();
+            try {
+                Map c1Map = new ObjectMapper().convertValue(c1, Map.class);
+                mDatabase.child("challenges").child(c1.getId().toString()).setValue(c1Map);
+            } catch (Exception e) {
+                Toast.makeText(this, "Failed to upload challenge", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivityForResult(intent, 0);
+        }).addOnFailureListener(e -> {
+            Toast.makeText(this, "Upload failed", Toast.LENGTH_SHORT).show();
+        });
+    }
+}
