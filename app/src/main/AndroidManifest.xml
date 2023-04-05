@@ -18,15 +18,15 @@
         <activity
             android:name=".MainActivity"
             android:exported="true">
-
-        </activity>
-        <activity android:name=".CameraCapture"
-            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".CameraCapture"
+            android:exported="true">
+
         </activity>
         <activity
             android:name=".ChallengeActivity"
@@ -65,6 +65,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".GoogleSignInActivity"></activity>
+        <activity android:name=".DatabaseTestActivity"></activity>
+        <activity android:name=".CreateChallengeActivity"></activity>
     </application>
 
 </manifest>
