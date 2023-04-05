@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         }
+    }
     protected void onStart() {
         super.onStart();
     }
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return true;
+    }
     public void goToCreateChallenge(View view) {
         Intent intent = new Intent(this, CreateChallengeActivity.class);
         startActivity(intent);
