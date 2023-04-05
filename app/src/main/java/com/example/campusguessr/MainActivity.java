@@ -48,6 +48,13 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         }
+    protected void onStart() {
+        super.onStart();
+    }
+
+    public void goToLogin(View view) {
+        Intent intent = new Intent(this, GoogleSignInActivity.class);
+        startActivity(intent);
     }
 
     private boolean allPermissionsGranted() {
@@ -58,5 +65,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return true;
+    public void goToCreateChallenge(View view) {
+        Intent intent = new Intent(this, CreateChallengeActivity.class);
+        startActivity(intent);
     }
 }
