@@ -20,12 +20,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        startActivity(new Intent(this, GoogleSignInActivity.class));
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        startActivity(new Intent(this, GoogleSignInActivity.class));
+    }
+
+    public void goToLogin(View view) {
+        Intent intent = new Intent(this, GoogleSignInActivity.class);
+        startActivity(intent);
+    }
+
+    public void goToCreateChallenge(View view) {
+        Intent intent = new Intent(this, CreateChallengeActivity.class);
+        startActivity(intent);
     }
 }

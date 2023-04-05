@@ -20,8 +20,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 
@@ -49,6 +51,7 @@ public class GoogleSignInActivity extends Activity implements FirebaseAuth.AuthS
     private FirebaseAuth mAuth;
 
     private GoogleSignInClient mGoogleSignInClient;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +76,10 @@ public class GoogleSignInActivity extends Activity implements FirebaseAuth.AuthS
         });
 
         mAuth.addAuthStateListener(this);
+
+        toolbar = findViewById(R.id.toolbar);
+        setActionBar(toolbar);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     public void onAuthStateChanged(FirebaseAuth auth) {
@@ -152,5 +159,15 @@ public class GoogleSignInActivity extends Activity implements FirebaseAuth.AuthS
     protected void onDestroy() {
         super.onDestroy();
         mAuth.removeAuthStateListener(this);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
