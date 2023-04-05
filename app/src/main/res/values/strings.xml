@@ -9,4 +9,7 @@
     <string name="navigate_play_tab_description">An icon of a map</string>
     <string name="navigate_ranking_tab_description">An icon of a badge</string>
     <string name="guess_button_text">Guess Here</string>
+    <string name="log_out">Log out</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="scoreTitle">Score:</string>
 </resources>

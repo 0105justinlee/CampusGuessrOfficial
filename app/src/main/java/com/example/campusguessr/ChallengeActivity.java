@@ -7,23 +7,23 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 
-public class ProfileActivity extends AppCompatActivity {
+public class ChallengeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.profile);
+        setContentView(R.layout.challenge);
         ImageButton RankingsButton = (ImageButton) findViewById(R.id.navigate_ranking_tab_button);
-        ImageButton PlayButton = (ImageButton) findViewById(R.id.navigate_play_tab_button);
+        ImageButton ProfileButton = (ImageButton) findViewById(R.id.navigate_profile_tab_button);
         RankingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), RankingsActivity.class));
             }
         });
-        PlayButton.setOnClickListener(new View.OnClickListener() {
+        ProfileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), StartChallengeActivity.class));
+                startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
             }
         });
     }
