@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageButton
+        android:id="@+id/verify_photo_back_button"
+        android:layout_width="64dp"
+        android:layout_height="62dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/baseline_arrow_back"
+        android:background="@android:color/transparent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="80dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/verify_photo_back_button">
+
+        <ImageView
+            android:id="@+id/userPhoto"
+            android:layout_width="314dp"
+            android:layout_height="225dp"
+            android:layout_weight="1"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            app:srcCompat="@drawable/temp_img" />
+
+        <ImageView
+            android:id="@+id/actualPhoto"
+            android:layout_width="314dp"
+            android:layout_height="225dp"
+            android:layout_weight="1"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            app:srcCompat="@drawable/temp_img" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/verify_photo_ask_verification"
+        android:layout_width="251dp"
+        android:layout_height="75dp"
+        android:layout_marginStart="80dp"
+        android:layout_marginTop="48dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="Is this location correct for this photo?"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+
+    <Button
+        android:id="@+id/verify_photo_post_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="112dp"
+        android:layout_marginTop="44dp"
+        android:text="Confirm and Post"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/verify_photo_ask_verification" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
