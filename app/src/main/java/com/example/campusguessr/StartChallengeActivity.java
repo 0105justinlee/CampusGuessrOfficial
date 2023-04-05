@@ -13,22 +13,22 @@ public class StartChallengeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.start_challenge);
-        Button StartChallengeButton = (Button) findViewById(R.id.start_challenge_button);
-        ImageButton RankingsButton = (ImageButton) findViewById(R.id.navigate_ranking_tab_button);
-        ImageButton ProfileButton = (ImageButton) findViewById(R.id.navigate_profile_tab_button);
-        StartChallengeButton.setOnClickListener(new View.OnClickListener() {
+        Button startChallengeButton = (Button) findViewById(R.id.start_challenge_button);
+        ImageButton rankingsButton = (ImageButton) findViewById(R.id.navigate_ranking_tab_button);
+        ImageButton profileButton = (ImageButton) findViewById(R.id.navigate_profile_tab_button);
+        startChallengeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), ChallengeActivity.class));
             }
         });
-        RankingsButton.setOnClickListener(new View.OnClickListener() {
+        rankingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), RankingsActivity.class));
             }
         });
-        ProfileButton.setOnClickListener(new View.OnClickListener() {
+        profileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
