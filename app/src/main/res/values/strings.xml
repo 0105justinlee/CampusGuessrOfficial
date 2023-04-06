@@ -12,4 +12,6 @@
     <string name="log_out">Log out</string>
     <string name="title_activity_maps">MapsActivity</string>
     <string name="scoreTitle">Score:</string>
+    <string name="duplicate_detect_question">Are these photos the same?</string>
+    <string name="duplicate_detect_may_exist">This challenge may already exist</string>
 </resources>

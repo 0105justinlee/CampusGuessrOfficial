@@ -15,7 +15,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CampusGuessr"
         tools:targetApi="31">
-
+        <activity
+            android:name=".VerifyPhotoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DuplicateDetectActivity"
+            android:exported="false" />
         <!--
              TODO: Before you run your application, you need a Google Maps API key.
 
@@ -34,7 +39,7 @@
         <activity
             android:name=".MapsActivity"
             android:exported="true"
-            android:label="@string/title_activity_maps"/>
+            android:label="@string/title_activity_maps" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -44,6 +49,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".CameraCapture"
+            android:exported="true"></activity>
         <activity
             android:name=".ChallengeActivity"
             android:exported="true">
@@ -81,8 +89,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".GoogleSignInActivity" />
-        <activity android:name=".DatabaseTestActivity"></activity>
-        <activity android:name=".CreateChallengeActivity"></activity>
+        <activity android:name=".DatabaseTestActivity" />
+        <activity android:name=".CreateChallengeActivity" />
     </application>
 
 </manifest>
