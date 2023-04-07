@@ -83,6 +83,7 @@
         <activity android:name=".GoogleSignInActivity" />
         <activity android:name=".DatabaseTestActivity"></activity>
         <activity android:name=".CreateChallengeActivity"></activity>
+        <activity android:name=".SubmitChallengeActivity"></activity>
     </application>
 
 </manifest>
