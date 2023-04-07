@@ -1,6 +1,5 @@
 package com.example.campusguessr;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,17 +12,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
-import java.util.concurrent.Executor;
 
 public class ChallengeActivity extends AppCompatActivity {
     int guessesMade = 0;
@@ -31,6 +27,7 @@ public class ChallengeActivity extends AppCompatActivity {
     private double[] currentCoords;
     double[] currentChallenge;
     ArrayList<String> guesses;
+    ArrayList<Location> guessLocations; // Locations for mapping player path
     GuessAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +35,12 @@ public class ChallengeActivity extends AppCompatActivity {
         setContentView(R.layout.challenge);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         getChallenge();
+
+        // Initialize guess tracking lists
         guesses = new ArrayList<String>();
+        guessLocations = new ArrayList<Location>();
+
+        // Set up recycler view for guesses
         RecyclerView recyclerView = findViewById(R.id.guesses);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new GuessAdapter(guesses);
@@ -86,13 +88,17 @@ public class ChallengeActivity extends AppCompatActivity {
                             double distance_latitude = (currentCoords[0]-currentChallenge[0])*364000;
                             double distance_longitude = (currentCoords[1]-currentChallenge[1])*288200;
                             double distance = Math.sqrt(distance_latitude*distance_latitude+distance_longitude*distance_longitude);
+                            if (distance < 50) {
+                                startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+                            }
                             guesses.add("You are " + distance + " feet away!");
+                            guessLocations.add(location);
                             adapter.notifyItemInserted(guesses.size()-1);
                         }
                     }
                 });
     }
     private void getChallenge() {
-        currentChallenge = new double[]{43.0715302, -89.40853};
+        currentChallenge = new double[]{43.07176, -89.4014};
     }
 }

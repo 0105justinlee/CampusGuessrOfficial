@@ -16,6 +16,7 @@ public class StartChallengeActivity extends AppCompatActivity {
         Button startChallengeButton = (Button) findViewById(R.id.start_challenge_button);
         ImageButton rankingsButton = (ImageButton) findViewById(R.id.navigate_ranking_tab_button);
         ImageButton profileButton = (ImageButton) findViewById(R.id.navigate_profile_tab_button);
+        ImageButton createButton = (ImageButton) findViewById(R.id.navigate_create_tab_button);
         startChallengeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -32,6 +33,12 @@ public class StartChallengeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
+            }
+        });
+        createButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), CreateChallengeActivity.class));
             }
         });
     }
