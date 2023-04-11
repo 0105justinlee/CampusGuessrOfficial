@@ -2,12 +2,12 @@ package com.example.campusguessr;
 
 import android.app.Activity;
 import android.content.res.Resources;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.example.campusguessr.POJOs.Challenge;
+import com.example.campusguessr.POJOs.Location;
 import com.example.campusguessr.POJOs.Orientation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -52,11 +52,12 @@ public class DatabaseTestActivity extends Activity {
             .addOnSuccessListener(taskSnapshot -> Log.d(TAG, "onSuccess: " + taskSnapshot.getMetadata().getName()));
         // wait for task to finish
 
-        Challenge c1 = new Challenge(UUID.randomUUID());
+        Challenge c1 = new Challenge();
+        c1.setId(UUID.randomUUID());
         c1.setCreatedAt(new Date());
         c1.setCreatedBy(mAuth.getCurrentUser().getUid());
         c1.setDescription("Example description");
-        c1.setLocation(new Location(""));
+        c1.setLocation(new Location(1.0f, 2.0f));
         c1.setOrientation(new Orientation(1.0f, 2.0f, 3.0f));
         c1.setName("Example Name");
         c1.setImageURL("");

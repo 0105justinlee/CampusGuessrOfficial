@@ -4,13 +4,17 @@ import android.location.Location;
 
 import java.util.Date;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Attempt {
-    private final String id;
-    private final String challengeId;
-    private final String userId;
-    private final Location[] guesses;
-    private final Date createdAt;
+    private String id;
+    private String challengeId;
+    private String userId;
+    private Location[] guesses;
+    private Date createdAt;
 }

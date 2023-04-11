@@ -1,10 +1,15 @@
 package com.example.campusguessr.POJOs;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Value;
 
-@Value
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Orientation {
-    public Float x;
-    public Float y;
-    public Float z;
+    Float x = 0.0f;
+    Float y = 0.0f;
+    Float z = 0.0f;
 }

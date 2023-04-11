@@ -27,6 +27,8 @@ import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 
+import com.example.campusguessr.POJOs.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -39,6 +41,10 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.Map;
 
 /**
  * Demonstrate Firebase Authentication using a Google ID Token.
@@ -52,6 +58,7 @@ public class GoogleSignInActivity extends Activity implements FirebaseAuth.AuthS
 
     private GoogleSignInClient mGoogleSignInClient;
     private Toolbar toolbar;
+    private DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +87,8 @@ public class GoogleSignInActivity extends Activity implements FirebaseAuth.AuthS
         toolbar = findViewById(R.id.toolbar);
         setActionBar(toolbar);
         getActionBar().setDisplayHomeAsUpEnabled(true);
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
     public void onAuthStateChanged(FirebaseAuth auth) {
@@ -92,6 +101,9 @@ public class GoogleSignInActivity extends Activity implements FirebaseAuth.AuthS
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         updateUI(currentUser);
+        if (currentUser != null) {
+            createUserDB(currentUser);
+        }
     }
 
     @Override
@@ -169,5 +181,21 @@ public class GoogleSignInActivity extends Activity implements FirebaseAuth.AuthS
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void createUserDB(FirebaseUser user) {
+        String uid = user.getUid();
+        DatabaseReference uRef = mDatabase.child("users").child(uid);
+        uRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                if (task.getResult().getValue() == null) {
+                    User newUser = new User();
+                    newUser.setUid(uid);
+                    ObjectMapper mapper = new ObjectMapper();
+                    Map json = mapper.convertValue(newUser, Map.class);
+                    uRef.setValue(json);
+                }
+            }
+        });
     }
 }

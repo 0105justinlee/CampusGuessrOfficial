@@ -3,13 +3,11 @@ package com.example.campusguessr.POJOs;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
-    private String uid;
-    private int score = 0;
+public class Location {
+    private double latitude;
+    private double longitude;
 }
