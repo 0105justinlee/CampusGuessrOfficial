@@ -15,38 +15,11 @@
         app:srcCompat="@drawable/ic_launcher_background" />
 
 
-    <TextView
-        android:id="@+id/guess_1_distance"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/guesses"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:textAlignment="center"
-        android:textColor="@color/design_default_color_error"
-        android:text="X distance away" />
-
-    <TextView
-        android:id="@+id/guess_2_distance"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:textAlignment="center"
-        android:textColor="@color/design_default_color_error"
-        android:text="X distance away" />
-
-    <TextView
-        android:id="@+id/guess_3_distance"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:textAlignment="center"
-        android:textColor="@color/design_default_color_error"
-        android:text="X distance away" />
-
-    <TextView
-        android:id="@+id/guess_4_distance"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:textAlignment="center"
         android:textColor="@color/design_default_color_error"
         android:text="X distance away" />
