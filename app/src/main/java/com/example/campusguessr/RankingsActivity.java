@@ -1,13 +1,18 @@
 package com.example.campusguessr;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
+import com.example.campusguessr.POJOs.User;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -16,8 +21,42 @@ import com.google.firebase.database.ValueEventListener;
 
 public class RankingsActivity extends AppCompatActivity {
 
+    public class RankingsAdapter extends RecyclerView.Adapter<RankingsAdapter.ViewHolder> {
+        private User[] users;
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            public TextView username;
+            public TextView score;
+            public ViewHolder(View v) {
+                super(v);
+                username = (TextView) v.findViewById(R.id.username);
+                score = (TextView) v.findViewById(R.id.score);
+            }
+        }
+        public RankingsAdapter(User[] users) {
+            this.users = users;
+        }
+        @Override
+        public RankingsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rankings_row_item, parent, false);
+            ViewHolder vh = new ViewHolder(v);
+            return vh;
+        }
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            holder.username.setText(users[position].getName());
+            holder.score.setText(users[position].getScore());
+        }
+        @Override
+        public int getItemCount() {
+            return users.length;
+        }
+    }
+
     private DatabaseReference mDatabase;
     private String TAG = "RankingsActivity";
+
+    protected RecyclerView mRecyclerView;
+    protected RecyclerView.LayoutManager mLayoutManager;
 //    private User[] users = new User[10];
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,5 +90,7 @@ public class RankingsActivity extends AppCompatActivity {
                 Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
             }
         });
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.dailyLayout);
     }
 }

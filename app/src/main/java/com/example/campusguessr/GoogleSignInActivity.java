@@ -191,6 +191,7 @@ public class GoogleSignInActivity extends Activity implements FirebaseAuth.AuthS
                 if (task.getResult().getValue() == null) {
                     User newUser = new User();
                     newUser.setUid(uid);
+                    newUser.setName(user.getDisplayName());
                     ObjectMapper mapper = new ObjectMapper();
                     Map json = mapper.convertValue(newUser, Map.class);
                     uRef.setValue(json);

@@ -1,7 +1,5 @@
 package com.example.campusguessr.POJOs;
 
-import android.location.Location;
-
 import java.util.Date;
 
 import lombok.AllArgsConstructor;

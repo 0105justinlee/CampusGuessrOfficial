@@ -11,13 +11,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Challenge {
-    private UUID id;
-    private Location location;
-    private String imageURL;
-    private Orientation orientation;
-    private String name;
-    private String description;
-    private String createdBy;
-    private Date createdAt;
+    UUID id;
+    Location location;
+    String imageURL;
+    Orientation orientation;
+    String name;
+    String description;
+    String createdBy;
+    Date createdAt;
 }
 

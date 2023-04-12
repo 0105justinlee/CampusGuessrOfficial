@@ -11,5 +11,6 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 public class User {
     private String uid;
+    private String name;
     private int score = 0;
 }

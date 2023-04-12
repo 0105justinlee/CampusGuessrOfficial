@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/dailyLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -40,396 +40,396 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/drank1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="1."
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.095"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/ranking_daily" />
+<!--                <TextView-->
+<!--                    android:id="@+id/drank1"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="1."-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintHorizontal_bias="0.095"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/ranking_daily" />-->
 
-                <TextView
-                    android:id="@+id/drank1_username"
-                    android:layout_width="137dp"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="44dp"
-                    android:layout_marginTop="16dp"
-                    android:text="User1"
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintStart_toEndOf="@+id/drank1"
-                    app:layout_constraintTop_toBottomOf="@+id/ranking_daily" />
+<!--                <TextView-->
+<!--                    android:id="@+id/drank1_username"-->
+<!--                    android:layout_width="137dp"-->
+<!--                    android:layout_height="36dp"-->
+<!--                    android:layout_marginStart="44dp"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="User1"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintStart_toEndOf="@+id/drank1"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/ranking_daily" />-->
 
-                <TextView
-                    android:id="@+id/drank1_score"
-                    android:layout_width="100dp"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="16dp"
-                    android:text="800"
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintStart_toEndOf="@+id/drank1_username"
-                    app:layout_constraintTop_toBottomOf="@+id/ranking_daily" />
+<!--                <TextView-->
+<!--                    android:id="@+id/drank1_score"-->
+<!--                    android:layout_width="100dp"-->
+<!--                    android:layout_height="36dp"-->
+<!--                    android:layout_marginStart="20dp"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="800"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintStart_toEndOf="@+id/drank1_username"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/ranking_daily" />-->
 
-                <TextView
-                    android:id="@+id/drank2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="2."
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.095"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/drank1" />
+<!--                <TextView-->
+<!--                    android:id="@+id/drank2"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="2."-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintHorizontal_bias="0.095"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/drank1" />-->
 
-                <TextView
-                    android:id="@+id/drank2_username"
-                    android:layout_width="137dp"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="44dp"
-                    android:layout_marginTop="16dp"
-                    android:text="User2"
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintStart_toEndOf="@+id/drank2"
-                    app:layout_constraintTop_toBottomOf="@+id/drank1" />
+<!--                <TextView-->
+<!--                    android:id="@+id/drank2_username"-->
+<!--                    android:layout_width="137dp"-->
+<!--                    android:layout_height="36dp"-->
+<!--                    android:layout_marginStart="44dp"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="User2"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintStart_toEndOf="@+id/drank2"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/drank1" />-->
 
-                <TextView
-                    android:id="@+id/drank2_score"
-                    android:layout_width="100dp"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="16dp"
-                    android:text="400"
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintStart_toEndOf="@+id/drank2_username"
-                    app:layout_constraintTop_toBottomOf="@+id/drank1" />
+<!--                <TextView-->
+<!--                    android:id="@+id/drank2_score"-->
+<!--                    android:layout_width="100dp"-->
+<!--                    android:layout_height="36dp"-->
+<!--                    android:layout_marginStart="20dp"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="400"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintStart_toEndOf="@+id/drank2_username"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/drank1" />-->
 
-                <TextView
-                    android:id="@+id/drank3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="3."
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.095"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/drank2"
-                    app:layout_constraintVertical_bias="0.0" />
+<!--                <TextView-->
+<!--                    android:id="@+id/drank3"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="3."-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintHorizontal_bias="0.095"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/drank2"-->
+<!--                    app:layout_constraintVertical_bias="0.0" />-->
 
-                <TextView
-                    android:id="@+id/drank3_username"
-                    android:layout_width="137dp"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="44dp"
-                    android:layout_marginTop="16dp"
-                    android:text="User3"
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintStart_toEndOf="@+id/drank3"
-                    app:layout_constraintTop_toBottomOf="@+id/drank2" />
+<!--                <TextView-->
+<!--                    android:id="@+id/drank3_username"-->
+<!--                    android:layout_width="137dp"-->
+<!--                    android:layout_height="36dp"-->
+<!--                    android:layout_marginStart="44dp"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="User3"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintStart_toEndOf="@+id/drank3"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/drank2" />-->
 
-                <TextView
-                    android:id="@+id/drank3_score"
-                    android:layout_width="100dp"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="16dp"
-                    android:text="300"
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintStart_toEndOf="@+id/drank3_username"
-                    app:layout_constraintTop_toBottomOf="@+id/drank2" />
+<!--                <TextView-->
+<!--                    android:id="@+id/drank3_score"-->
+<!--                    android:layout_width="100dp"-->
+<!--                    android:layout_height="36dp"-->
+<!--                    android:layout_marginStart="20dp"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="300"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintStart_toEndOf="@+id/drank3_username"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/drank2" />-->
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.recyclerview.widget.RecyclerView>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/weekly_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="36dp"
-                android:background="#33000000"
-                android:paddingBottom="20dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/dailyLayout">
+<!--            <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--                android:id="@+id/weekly_layout"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_marginTop="36dp"-->
+<!--                android:background="#33000000"-->
+<!--                android:paddingBottom="20dp"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintHorizontal_bias="0.0"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/dailyLayout">-->
 
-                <TextView
-                    android:id="@+id/ranking_weekly"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="Weekly:"
-                    android:textColor="@color/black"
-                    android:textSize="40sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+<!--                <TextView-->
+<!--                    android:id="@+id/ranking_weekly"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginStart="16dp"-->
+<!--                    android:text="Weekly:"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="40sp"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toTopOf="parent" />-->
 
-                <TextView
-                    android:id="@+id/wrank1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="1."
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.095"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/ranking_weekly" />
+<!--                <TextView-->
+<!--                    android:id="@+id/wrank1"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="1."-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintHorizontal_bias="0.095"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/ranking_weekly" />-->
 
-                <TextView
-                    android:id="@+id/wrank1_username"
-                    android:layout_width="137dp"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="44dp"
-                    android:layout_marginTop="16dp"
-                    android:text="User1"
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintStart_toEndOf="@+id/wrank1"
-                    app:layout_constraintTop_toBottomOf="@+id/ranking_weekly" />
+<!--                <TextView-->
+<!--                    android:id="@+id/wrank1_username"-->
+<!--                    android:layout_width="137dp"-->
+<!--                    android:layout_height="36dp"-->
+<!--                    android:layout_marginStart="44dp"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="User1"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintStart_toEndOf="@+id/wrank1"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/ranking_weekly" />-->
 
-                <TextView
-                    android:id="@+id/wrank1_score"
-                    android:layout_width="100dp"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="16dp"
-                    android:text="1200"
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintStart_toEndOf="@+id/wrank1_username"
-                    app:layout_constraintTop_toBottomOf="@+id/ranking_weekly" />
+<!--                <TextView-->
+<!--                    android:id="@+id/wrank1_score"-->
+<!--                    android:layout_width="100dp"-->
+<!--                    android:layout_height="36dp"-->
+<!--                    android:layout_marginStart="20dp"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="1200"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintStart_toEndOf="@+id/wrank1_username"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/ranking_weekly" />-->
 
-                <TextView
-                    android:id="@+id/wrank2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="2."
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.095"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/wrank1" />
+<!--                <TextView-->
+<!--                    android:id="@+id/wrank2"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="2."-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintHorizontal_bias="0.095"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/wrank1" />-->
 
-                <TextView
-                    android:id="@+id/wrank2_username"
-                    android:layout_width="137dp"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="44dp"
-                    android:layout_marginTop="16dp"
-                    android:text="User2"
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintStart_toEndOf="@+id/wrank2"
-                    app:layout_constraintTop_toBottomOf="@+id/wrank1" />
+<!--                <TextView-->
+<!--                    android:id="@+id/wrank2_username"-->
+<!--                    android:layout_width="137dp"-->
+<!--                    android:layout_height="36dp"-->
+<!--                    android:layout_marginStart="44dp"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="User2"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintStart_toEndOf="@+id/wrank2"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/wrank1" />-->
 
-                <TextView
-                    android:id="@+id/wrank2_score"
-                    android:layout_width="100dp"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="16dp"
-                    android:text="900"
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintStart_toEndOf="@+id/wrank2_username"
-                    app:layout_constraintTop_toBottomOf="@+id/wrank1" />
+<!--                <TextView-->
+<!--                    android:id="@+id/wrank2_score"-->
+<!--                    android:layout_width="100dp"-->
+<!--                    android:layout_height="36dp"-->
+<!--                    android:layout_marginStart="20dp"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="900"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintStart_toEndOf="@+id/wrank2_username"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/wrank1" />-->
 
-                <TextView
-                    android:id="@+id/wrank3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="3."
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.095"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/wrank2"
-                    app:layout_constraintVertical_bias="0.0" />
+<!--                <TextView-->
+<!--                    android:id="@+id/wrank3"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="3."-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintHorizontal_bias="0.095"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/wrank2"-->
+<!--                    app:layout_constraintVertical_bias="0.0" />-->
 
-                <TextView
-                    android:id="@+id/wrank3_username"
-                    android:layout_width="137dp"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="44dp"
-                    android:layout_marginTop="16dp"
-                    android:text="User3"
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintStart_toEndOf="@+id/wrank3"
-                    app:layout_constraintTop_toBottomOf="@+id/wrank2" />
+<!--                <TextView-->
+<!--                    android:id="@+id/wrank3_username"-->
+<!--                    android:layout_width="137dp"-->
+<!--                    android:layout_height="36dp"-->
+<!--                    android:layout_marginStart="44dp"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="User3"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintStart_toEndOf="@+id/wrank3"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/wrank2" />-->
 
-                <TextView
-                    android:id="@+id/wrank3_score"
-                    android:layout_width="100dp"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="16dp"
-                    android:text="700"
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintStart_toEndOf="@+id/wrank3_username"
-                    app:layout_constraintTop_toBottomOf="@+id/wrank2" />
+<!--                <TextView-->
+<!--                    android:id="@+id/wrank3_score"-->
+<!--                    android:layout_width="100dp"-->
+<!--                    android:layout_height="36dp"-->
+<!--                    android:layout_marginStart="20dp"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="700"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintStart_toEndOf="@+id/wrank3_username"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/wrank2" />-->
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+<!--            </androidx.constraintlayout.widget.ConstraintLayout>-->
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/all_time_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="36dp"
-                android:background="#33000000"
-                android:paddingBottom="20dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/weekly_layout">
+<!--            <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--                android:id="@+id/all_time_layout"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_marginTop="36dp"-->
+<!--                android:background="#33000000"-->
+<!--                android:paddingBottom="20dp"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintHorizontal_bias="0.0"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/weekly_layout">-->
 
-                <TextView
-                    android:id="@+id/ranking_all_time"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="All time:"
-                    android:textColor="@color/black"
-                    android:textSize="40sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+<!--                <TextView-->
+<!--                    android:id="@+id/ranking_all_time"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginStart="16dp"-->
+<!--                    android:text="All time:"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="40sp"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toTopOf="parent" />-->
 
-                <TextView
-                    android:id="@+id/arank1_username"
-                    android:layout_width="137dp"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="44dp"
-                    android:layout_marginTop="16dp"
-                    android:text="User1"
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintStart_toEndOf="@+id/arank1"
-                    app:layout_constraintTop_toBottomOf="@+id/ranking_all_time" />
+<!--                <TextView-->
+<!--                    android:id="@+id/arank1_username"-->
+<!--                    android:layout_width="137dp"-->
+<!--                    android:layout_height="36dp"-->
+<!--                    android:layout_marginStart="44dp"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="User1"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintStart_toEndOf="@+id/arank1"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/ranking_all_time" />-->
 
-                <TextView
-                    android:id="@+id/arank1_score"
-                    android:layout_width="100dp"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="16dp"
-                    android:text="24000"
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintStart_toEndOf="@+id/arank1_username"
-                    app:layout_constraintTop_toBottomOf="@+id/ranking_all_time" />
+<!--                <TextView-->
+<!--                    android:id="@+id/arank1_score"-->
+<!--                    android:layout_width="100dp"-->
+<!--                    android:layout_height="36dp"-->
+<!--                    android:layout_marginStart="20dp"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="24000"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintStart_toEndOf="@+id/arank1_username"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/ranking_all_time" />-->
 
-                <TextView
-                    android:id="@+id/arank2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="2."
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.095"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/arank1" />
+<!--                <TextView-->
+<!--                    android:id="@+id/arank2"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="2."-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintHorizontal_bias="0.095"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/arank1" />-->
 
-                <TextView
-                    android:id="@+id/arank1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="1."
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.095"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/ranking_all_time" />
+<!--                <TextView-->
+<!--                    android:id="@+id/arank1"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="1."-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintHorizontal_bias="0.095"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/ranking_all_time" />-->
 
-                <TextView
-                    android:id="@+id/arank3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="3."
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.095"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/arank2"
-                    app:layout_constraintVertical_bias="0.0" />
+<!--                <TextView-->
+<!--                    android:id="@+id/arank3"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="3."-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintHorizontal_bias="0.095"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/arank2"-->
+<!--                    app:layout_constraintVertical_bias="0.0" />-->
 
-                <TextView
-                    android:id="@+id/arank2_username"
-                    android:layout_width="137dp"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="44dp"
-                    android:layout_marginTop="16dp"
-                    android:text="User2"
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintStart_toEndOf="@+id/arank2"
-                    app:layout_constraintTop_toBottomOf="@+id/arank1" />
+<!--                <TextView-->
+<!--                    android:id="@+id/arank2_username"-->
+<!--                    android:layout_width="137dp"-->
+<!--                    android:layout_height="36dp"-->
+<!--                    android:layout_marginStart="44dp"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="User2"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintStart_toEndOf="@+id/arank2"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/arank1" />-->
 
-                <TextView
-                    android:id="@+id/arank2_score"
-                    android:layout_width="100dp"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="16dp"
-                    android:text="18900"
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintStart_toEndOf="@+id/arank2_username"
-                    app:layout_constraintTop_toBottomOf="@+id/arank1" />
+<!--                <TextView-->
+<!--                    android:id="@+id/arank2_score"-->
+<!--                    android:layout_width="100dp"-->
+<!--                    android:layout_height="36dp"-->
+<!--                    android:layout_marginStart="20dp"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="18900"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintStart_toEndOf="@+id/arank2_username"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/arank1" />-->
 
-                <TextView
-                    android:id="@+id/arank3_username"
-                    android:layout_width="137dp"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="44dp"
-                    android:layout_marginTop="16dp"
-                    android:text="User3"
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintStart_toEndOf="@+id/arank3"
-                    app:layout_constraintTop_toBottomOf="@+id/arank2" />
+<!--                <TextView-->
+<!--                    android:id="@+id/arank3_username"-->
+<!--                    android:layout_width="137dp"-->
+<!--                    android:layout_height="36dp"-->
+<!--                    android:layout_marginStart="44dp"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="User3"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintStart_toEndOf="@+id/arank3"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/arank2" />-->
 
-                <TextView
-                    android:id="@+id/arank3_score"
-                    android:layout_width="100dp"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="16dp"
-                    android:text="17800"
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    app:layout_constraintStart_toEndOf="@+id/arank3_username"
-                    app:layout_constraintTop_toBottomOf="@+id/arank2" />
+<!--                <TextView-->
+<!--                    android:id="@+id/arank3_score"-->
+<!--                    android:layout_width="100dp"-->
+<!--                    android:layout_height="36dp"-->
+<!--                    android:layout_marginStart="20dp"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:text="17800"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp"-->
+<!--                    app:layout_constraintStart_toEndOf="@+id/arank3_username"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/arank2" />-->
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+<!--            </androidx.constraintlayout.widget.ConstraintLayout>-->
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

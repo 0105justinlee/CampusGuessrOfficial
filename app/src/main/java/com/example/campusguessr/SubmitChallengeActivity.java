@@ -1,7 +1,6 @@
 package com.example.campusguessr;
 
 import android.app.Activity;
-import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -9,6 +8,7 @@ import android.widget.Toast;
 
 import com.example.campusguessr.POJOs.Attempt;
 import com.example.campusguessr.POJOs.Challenge;
+import com.example.campusguessr.POJOs.Location;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -38,13 +38,13 @@ public class SubmitChallengeActivity extends Activity {
 
     public void submitChallengeMock(View view) {
         Location[] mockGuesses = new Location[3];
-        mockGuesses[0] = new Location("mock");
+        mockGuesses[0] = new Location();
         mockGuesses[0].setLatitude(0.0);
         mockGuesses[0].setLongitude(0.0);
-        mockGuesses[1] = new Location("mock");
+        mockGuesses[1] = new Location();
         mockGuesses[1].setLatitude(0.0);
         mockGuesses[1].setLongitude(0.0);
-        mockGuesses[2] = new Location("mock");
+        mockGuesses[2] = new Location();
         mockGuesses[2].setLatitude(0.0);
         mockGuesses[2].setLongitude(0.0);
         submitChallenge("mock", mockGuesses, 600);
@@ -72,7 +72,8 @@ public class SubmitChallengeActivity extends Activity {
         });
 
         f.thenAccept(challenge -> {
-            int myScore = guesses.length;
+            Integer distance = challenge.getLocation().distanceTo(guesses[guesses.length - 1]);
+            int myScore = distance / guesses.length;
             String uId = mAuth.getCurrentUser().getUid();
             Date currentTime = Calendar.getInstance().getTime();
 
