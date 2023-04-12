@@ -23,8 +23,9 @@ public class CompleteChallengeActivity extends FragmentActivity implements OnMap
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    /*
-    TODO app crashes with navigation enabled
+    binding = CompleteChallengeBinding.inflate(getLayoutInflater());
+    setContentView(binding.getRoot());
+
     ImageButton RankingButton = (ImageButton) findViewById(R.id.navigate_ranking_tab_button);
     ImageButton PlayButton = (ImageButton) findViewById(R.id.navigate_play_tab_button);
     ImageButton CreateButton = (ImageButton) findViewById(R.id.navigate_create_tab_button);
@@ -35,6 +36,7 @@ public class CompleteChallengeActivity extends FragmentActivity implements OnMap
         startActivity(new Intent(getApplicationContext(), RankingsActivity.class));
       }
     });
+    
     PlayButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -53,10 +55,8 @@ public class CompleteChallengeActivity extends FragmentActivity implements OnMap
         startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
       }
     });
-    */
     
-    binding = CompleteChallengeBinding.inflate(getLayoutInflater());
-    setContentView(binding.getRoot());
+    
     
     // Obtain the SupportMapFragment and get notified when the map is ready to be used.
     SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
