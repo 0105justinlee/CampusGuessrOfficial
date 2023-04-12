@@ -1,6 +1,7 @@
 package com.example.campusguessr;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.campusguessr.POJOs.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -43,6 +45,9 @@ public class RankingsActivity extends AppCompatActivity {
         }
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
+            if (users[position] == null) {
+                return;
+            }
             holder.username.setText(users[position].getName());
             holder.score.setText(users[position].getScore());
         }
@@ -57,7 +62,8 @@ public class RankingsActivity extends AppCompatActivity {
 
     protected RecyclerView mRecyclerView;
     protected RecyclerView.LayoutManager mLayoutManager;
-//    private User[] users = new User[10];
+    protected RecyclerView.Adapter mAdapter;
+    private User[] users = new User[10];
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,12 +84,19 @@ public class RankingsActivity extends AppCompatActivity {
         });
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference ref = mDatabase.child("user");
-        ref.addValueEventListener(new ValueEventListener() {
+        DatabaseReference ref = mDatabase.child("users");
+        ref.orderByChild("score").limitToFirst(10).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                dataSnapshot.getChildren();
-
+//                Log.d(TAG, "onDataChange: " + dataSnapshot);
+                ObjectMapper mapper = new ObjectMapper();
+                int i = 0;
+                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                    User user = mapper.convertValue(child.getValue(), User.class);
+                    users[i] = user;
+                    i++;
+                    mAdapter.notifyDataSetChanged();
+                }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -92,5 +105,9 @@ public class RankingsActivity extends AppCompatActivity {
         });
 
         mRecyclerView = (RecyclerView) findViewById(R.id.dailyLayout);
+        mLayoutManager = new LinearLayoutManager(this);
+        mAdapter = new RankingsAdapter(users);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
     }
 }

@@ -21,25 +21,22 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
+            <TextView
+                android:id="@+id/ranking_daily"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Daily:"
+                android:textColor="@color/black"
+                android:textSize="40sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/dailyLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="#33000000"
                 android:paddingBottom="20dp">
-
-                <TextView
-                    android:id="@+id/ranking_daily"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="Daily:"
-                    android:textColor="@color/black"
-                    android:textSize="40sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
 <!--                <TextView-->
 <!--                    android:id="@+id/drank1"-->
 <!--                    android:layout_width="wrap_content"-->

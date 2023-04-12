@@ -76,4 +76,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, SubmitChallengeActivity.class);
         startActivity(intent);
     }
+
+    public void goToStartChallenge(View view) {
+        Intent intent = new Intent(this, StartChallengeActivity.class);
+        startActivity(intent);
+    }
 }

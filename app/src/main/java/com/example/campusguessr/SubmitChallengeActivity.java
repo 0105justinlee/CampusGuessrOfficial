@@ -94,7 +94,7 @@ public class SubmitChallengeActivity extends Activity {
                     .push()
                     .setValue(attempt.getId());
 
-            DatabaseReference scoreRef = mDatabase.child("user")
+            DatabaseReference scoreRef = mDatabase.child("users")
                     .child(uId)
                     .child("score");
             scoreRef
