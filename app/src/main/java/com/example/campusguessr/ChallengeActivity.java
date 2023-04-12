@@ -89,7 +89,7 @@ public class ChallengeActivity extends AppCompatActivity {
                             double distance_longitude = (currentCoords[1]-currentChallenge[1])*288200;
                             double distance = Math.sqrt(distance_latitude*distance_latitude+distance_longitude*distance_longitude);
                             if (distance < 50) {
-                                startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+                                startActivity(new Intent(getApplicationContext(), CompleteChallengeActivity.class));
                             }
                             guesses.add("You are " + distance + " feet away!");
                             guessLocations.add(location);
