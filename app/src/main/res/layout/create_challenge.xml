@@ -33,7 +33,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="100dp"
-        android:layout_marginTop="138dp"
+        android:layout_marginTop="50dp"
         android:text="Title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -108,4 +108,52 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/capturePhoto"
         android:onClick="submit"/>
+
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:layout_width="match_parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/capturePhoto"
+        android:layout_height="90dp"
+        android:layout_marginTop="136dp"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/navigate_ranking_tab_button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                app:srcCompat="@drawable/baseline_military_tech_24"
+                android:contentDescription="@string/navigate_ranking_tab_description" />
+
+            <ImageButton
+                android:id="@+id/navigate_play_tab_button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                app:srcCompat="@drawable/baseline_map_24"
+                android:contentDescription="@string/navigate_play_tab_description" />
+
+            <ImageButton
+                android:id="@+id/navigate_create_tab_button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                app:srcCompat="@drawable/baseline_photo_camera_24"
+                android:contentDescription="@string/navigate_create_tab_description" />
+
+            <ImageButton
+                android:id="@+id/navigate_profile_tab_button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                app:srcCompat="@drawable/baseline_person_outline_24"
+                android:contentDescription="@string/navigate_profile_tab_description" />
+        </LinearLayout>
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
 </androidx.constraintlayout.widget.ConstraintLayout>

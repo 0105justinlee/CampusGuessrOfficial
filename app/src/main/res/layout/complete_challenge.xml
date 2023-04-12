@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="550dp"
         android:layout_marginTop="30dp"
-        tools:context=".MapsActivity"
+        tools:context=".CompleteChallengeActivity"
         class="com.google.android.gms.maps.SupportMapFragment"/>
 
     <TextView

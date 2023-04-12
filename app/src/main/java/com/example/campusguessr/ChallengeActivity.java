@@ -94,7 +94,9 @@ public class ChallengeActivity extends AppCompatActivity {
                 }
                 if (distance < 50) {
                     text.setText("You are there!");
-                    return; // TODO switch to challenge complete activity
+                    // switch to challenge complete activity
+                    startActivity(new Intent(getApplicationContext(), CompleteChallengeActivity.class));
+                    return;
                 }
                 text.setText("You are " + distance + " feet away!");
             }
