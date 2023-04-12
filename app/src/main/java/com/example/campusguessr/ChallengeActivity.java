@@ -14,40 +14,63 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.campusguessr.POJOs.Challenge;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.Executor;
 
 public class ChallengeActivity extends AppCompatActivity {
-    int guessesMade = 0;
     private FusedLocationProviderClient fusedLocationClient;
     private double[] currentCoords;
-    double[] currentChallenge;
-    ArrayList<String> guesses;
-    GuessAdapter adapter;
+    private double[] currentChallenge;
+    private ArrayList<String> guesses;
+    private GuessAdapter adapter;
+
+    private FirebaseAuth mAuth;
+    private FirebaseStorage storage;
+    private DatabaseReference mDatabase;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.challenge);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        getChallenge();
+
+        // Set up recycler view for tracking user guesses
         guesses = new ArrayList<String>();
         RecyclerView recyclerView = findViewById(R.id.guesses);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new GuessAdapter(guesses);
         recyclerView.setAdapter(adapter);
 
+        // Initialize Firebase resources
+        mAuth = FirebaseAuth.getInstance();
+        storage = FirebaseStorage.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
         // Initialize buttons
         ImageButton RankingsButton = findViewById(R.id.navigate_ranking_tab_button);
         ImageButton ProfileButton = findViewById(R.id.navigate_profile_tab_button);
         Button GuessButton = findViewById(R.id.guess_button);
+
+        getChallenge();
 
         // Set up navigation menu
         RankingsButton.setOnClickListener(new View.OnClickListener() {
@@ -82,7 +105,6 @@ public class ChallengeActivity extends AppCompatActivity {
                     public void onSuccess(Location location) {
                         if (location != null) {
                             currentCoords = new double[]{location.getLatitude(), location.getLongitude()};
-                            guessesMade++;
                             double distance_latitude = (currentCoords[0]-currentChallenge[0])*364000;
                             double distance_longitude = (currentCoords[1]-currentChallenge[1])*288200;
                             double distance = Math.sqrt(distance_latitude*distance_latitude+distance_longitude*distance_longitude);
@@ -93,6 +115,18 @@ public class ChallengeActivity extends AppCompatActivity {
                 });
     }
     private void getChallenge() {
+        mDatabase.child("challenges").child("02672d4d-75b4-4c86-bb38-65c247f72f5f").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (!task.isSuccessful()) {
+                    Toast.makeText(getApplicationContext(), ("Error getting data: " + task.getException().getMessage()), Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Challenge currentChallenge = new ObjectMapper().convertValue(task.getResult().getValue(), Challenge.class);
+                    Toast.makeText(getApplicationContext(), currentChallenge.toString(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         currentChallenge = new double[]{43.0715302, -89.40853};
     }
 }
