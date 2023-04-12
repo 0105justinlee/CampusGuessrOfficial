@@ -1,6 +1,5 @@
 package com.example.campusguessr;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,7 +18,6 @@ import android.widget.Toast;
 import com.example.campusguessr.POJOs.Challenge;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
@@ -47,6 +45,10 @@ public class ChallengeActivity extends AppCompatActivity {
     private FirebaseStorage storage;
     private DatabaseReference mDatabase;
 
+    double[] currentChallenge;
+    ArrayList<String> guesses;
+    ArrayList<Location> guessLocations; // Locations for mapping player path
+    GuessAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +57,9 @@ public class ChallengeActivity extends AppCompatActivity {
 
         // Set up recycler view for tracking user guesses
         guesses = new ArrayList<String>();
+        guessLocations = new ArrayList<Location>();
+
+        // Set up recycler view for guesses
         RecyclerView recyclerView = findViewById(R.id.guesses);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new GuessAdapter(guesses);
@@ -108,7 +113,11 @@ public class ChallengeActivity extends AppCompatActivity {
                             double distance_latitude = (currentCoords[0]-currentChallenge[0])*364000;
                             double distance_longitude = (currentCoords[1]-currentChallenge[1])*288200;
                             double distance = Math.sqrt(distance_latitude*distance_latitude+distance_longitude*distance_longitude);
+                            if (distance < 50) {
+                                startActivity(new Intent(getApplicationContext(), CompleteChallengeActivity.class));
+                            }
                             guesses.add("You are " + distance + " feet away!");
+                            guessLocations.add(location);
                             adapter.notifyItemInserted(guesses.size()-1);
                         }
                     }

@@ -1,0 +1,45 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="400px"
+    android:layout_marginLeft="0px"
+    android:layout_marginRight="0px"
+    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/drank1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="1."
+                        android:textColor="@color/black"
+                        android:textSize="30sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.095"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/ranking_daily" />
+
+                    <TextView
+                        android:id="@+id/username"
+                        android:layout_width="137dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="44dp"
+                        android:layout_marginTop="16dp"
+                        android:text="User1"
+                        android:textColor="@color/black"
+                        android:textSize="30sp"
+                        app:layout_constraintStart_toEndOf="@+id/drank1"
+                        app:layout_constraintTop_toBottomOf="@+id/ranking_daily" />
+
+                    <TextView
+                        android:id="@+id/score"
+                        android:layout_width="100dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="16dp"
+                        android:text="800"
+                        android:textColor="@color/black"
+                        android:textSize="30sp"
+                        app:layout_constraintStart_toEndOf="@+id/drank1_username"
+                        app:layout_constraintTop_toBottomOf="@+id/ranking_daily" />
+</FrameLayout>

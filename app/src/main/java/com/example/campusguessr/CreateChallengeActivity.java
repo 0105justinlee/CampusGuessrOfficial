@@ -2,11 +2,11 @@ package com.example.campusguessr;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +14,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultCallback;
 
 import com.example.campusguessr.POJOs.Challenge;
+import com.example.campusguessr.POJOs.Location;
 import com.example.campusguessr.POJOs.Orientation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.auth.FirebaseAuth;
@@ -60,6 +61,37 @@ public class CreateChallengeActivity extends Activity {
         mAuth = FirebaseAuth.getInstance();
         storage = FirebaseStorage.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
+    
+        // TODO figure out why icons do not show up
+        ImageButton RankingsButton = (ImageButton) findViewById(R.id.navigate_ranking_tab_button);
+        ImageButton CreateButton = (ImageButton) findViewById(R.id.navigate_create_tab_button);
+        ImageButton PlayButton = (ImageButton) findViewById(R.id.navigate_play_tab_button);
+        ImageButton ProfileButton = (ImageButton) findViewById(R.id.navigate_profile_tab_button);
+    
+        RankingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), RankingsActivity.class));
+            }
+        });
+        CreateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), CreateChallengeActivity.class));
+            }
+        });
+        PlayButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), StartChallengeActivity.class));
+            }
+        });
+        ProfileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
+            }
+        });
     }
 
     @Override
@@ -87,12 +119,13 @@ public class CreateChallengeActivity extends Activity {
     }
 
     public void submit(View view) {
-        Challenge c1 = new Challenge(UUID.randomUUID());
+        Challenge c1 = new Challenge();
+        c1.setId(UUID.randomUUID());
         c1.setCreatedAt(new Date());
         c1.setCreatedBy(mAuth.getCurrentUser().getUid());
         c1.setName(titleText.getText().toString());
         c1.setDescription(descriptionText.getText().toString());
-        Location location = new Location("");
+        Location location = new Location();
         location.setLatitude(this.location[0]);
         location.setLongitude(this.location[1]);
         c1.setLocation(location);

@@ -1,9 +1,16 @@
 package com.example.campusguessr.POJOs;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
-    @NonNull private String uid;
+    private String uid;
+    private String name;
+    private int score = 0;
 }

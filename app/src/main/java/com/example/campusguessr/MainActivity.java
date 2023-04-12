@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
-                startActivity(new Intent(this, StartChallengeActivity.class));
+//                startActivity(new Intent(this, StartChallengeActivity.class));
             } else {
                 Toast.makeText(this, "Permissions not granted by the user.", Toast.LENGTH_SHORT).show();
                 finish();
@@ -69,6 +69,16 @@ public class MainActivity extends AppCompatActivity {
     }
     public void goToCreateChallenge(View view) {
         Intent intent = new Intent(this, CreateChallengeActivity.class);
+        startActivity(intent);
+    }
+
+    public void goToSubmitChallenge(View view) {
+        Intent intent = new Intent(this, SubmitChallengeActivity.class);
+        startActivity(intent);
+    }
+
+    public void goToStartChallenge(View view) {
+        Intent intent = new Intent(this, StartChallengeActivity.class);
         startActivity(intent);
     }
 }
