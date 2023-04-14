@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.campusguessr.POJOs.Challenge;
@@ -31,24 +30,19 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.concurrent.Executor;
+import java.util.UUID;
 
 public class ChallengeActivity extends AppCompatActivity {
     private FusedLocationProviderClient fusedLocationClient;
     private double[] currentCoords;
-    private double[] currentChallenge;
+    private Challenge currentChallenge;
     private ArrayList<String> guesses;
     private GuessAdapter adapter;
 
     private FirebaseAuth mAuth;
     private FirebaseStorage storage;
     private DatabaseReference mDatabase;
-
-    double[] currentChallenge;
-    ArrayList<String> guesses;
     ArrayList<Location> guessLocations; // Locations for mapping player path
-    GuessAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +69,7 @@ public class ChallengeActivity extends AppCompatActivity {
         ImageButton ProfileButton = findViewById(R.id.navigate_profile_tab_button);
         Button GuessButton = findViewById(R.id.guess_button);
 
+        // Initialize challenge for this session
         getChallenge();
 
         // Set up navigation menu
@@ -99,10 +94,20 @@ public class ChallengeActivity extends AppCompatActivity {
             }
         });
     }
+
+    /**
+     * Gets the current location and compares it with the challenge goal
+     * Switches to challenge complete screen if the location is found, otherwise displays distance
+     */
     private void getLocation() {
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        // Check if permissions have been granted
+        int finePermissionsGranted = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION);
+        int coarsePermissionsGranted = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION);
+        if (finePermissionsGranted != PackageManager.PERMISSION_GRANTED && coarsePermissionsGranted != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+
+        // Get location from location client
         LocationRequest locationRequest = new LocationRequest.Builder(100).build();
         fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
                 .addOnSuccessListener(ChallengeActivity.this, new OnSuccessListener<Location>() {
@@ -110,8 +115,9 @@ public class ChallengeActivity extends AppCompatActivity {
                     public void onSuccess(Location location) {
                         if (location != null) {
                             currentCoords = new double[]{location.getLatitude(), location.getLongitude()};
-                            double distance_latitude = (currentCoords[0]-currentChallenge[0])*364000;
-                            double distance_longitude = (currentCoords[1]-currentChallenge[1])*288200;
+                            com.example.campusguessr.POJOs.Location challengeLocation = currentChallenge.getLocation();
+                            double distance_latitude = (currentCoords[0]- challengeLocation.getLatitude())*364000;
+                            double distance_longitude = (currentCoords[1]-challengeLocation.getLongitude())*288200;
                             double distance = Math.sqrt(distance_latitude*distance_latitude+distance_longitude*distance_longitude);
                             if (distance < 50) {
                                 startActivity(new Intent(getApplicationContext(), CompleteChallengeActivity.class));
@@ -123,19 +129,25 @@ public class ChallengeActivity extends AppCompatActivity {
                     }
                 });
     }
+
+    /**
+     * Gets a random challenge from the Firebase real time database and stores to currentChallenge
+     */
     private void getChallenge() {
-        mDatabase.child("challenges").child("02672d4d-75b4-4c86-bb38-65c247f72f5f").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+        mDatabase.child("challenges").orderByKey().startAt(UUID.randomUUID().toString())
+                .limitToFirst(1).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<DataSnapshot> task) {
+            public void onComplete(Task<DataSnapshot> task) {
                 if (!task.isSuccessful()) {
-                    Toast.makeText(getApplicationContext(), ("Error getting data: " + task.getException().getMessage()), Toast.LENGTH_SHORT).show();
+                    String str = "Error getting data: " + task.getException().getMessage();
+                    Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    Challenge currentChallenge = new ObjectMapper().convertValue(task.getResult().getValue(), Challenge.class);
-                    Toast.makeText(getApplicationContext(), currentChallenge.toString(), Toast.LENGTH_SHORT).show();
+                    DataSnapshot dataSnapshot = task.getResult();
+                    DataSnapshot childSnap = dataSnapshot.getChildren().iterator().next();
+                    currentChallenge = new ObjectMapper().convertValue(childSnap.getValue(), Challenge.class);
                 }
             }
         });
-        currentChallenge = new double[]{43.0715302, -89.40853};
     }
 }
