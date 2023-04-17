@@ -199,7 +199,7 @@ public class ChallengeActivity extends AppCompatActivity {
                     ObjectMapper mapper = new ObjectMapper();
                     Challenge challenge = mapper.convertValue(m, Challenge.class);
                     Integer distance = challenge.getLocation().distanceTo(guesses[0]);
-                    int myScore = distance / guesses.length;
+                    long myScore = Math.round((distance * 100.0) / guesses.length);
                     String uId = mAuth.getCurrentUser().getUid();
                     Date currentTime = Calendar.getInstance().getTime();
                     Log.d(TAG, "submitChallenge: " + myScore);
