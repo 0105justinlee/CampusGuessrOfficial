@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultCallback;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.campusguessr.POJOs.Challenge;
 import com.example.campusguessr.POJOs.Location;
@@ -30,7 +31,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
-public class CreateChallengeActivity extends Activity {
+public class CreateChallengeActivity extends AppCompatActivity {
     private final String TAG = "Create Challenge";
 
     private double[] location = new double[2];
