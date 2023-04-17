@@ -164,6 +164,8 @@ public class GoogleSignInActivity extends Activity implements FirebaseAuth.AuthS
             usernameTV.setText("logged in: " + mAuth.getCurrentUser().getDisplayName());
             findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
             findViewById(R.id.sign_in_button).setVisibility(View.INVISIBLE);
+            // navigate to start challenge page
+            startActivity(new Intent(getApplicationContext(), StartChallengeActivity.class));
         }
     }
 
