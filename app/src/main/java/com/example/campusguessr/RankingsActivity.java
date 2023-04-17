@@ -21,20 +21,24 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+
 public class RankingsActivity extends AppCompatActivity {
 
     public class RankingsAdapter extends RecyclerView.Adapter<RankingsAdapter.ViewHolder> {
-        private User[] users;
+        private ArrayList<User> users;
         public class ViewHolder extends RecyclerView.ViewHolder {
             public TextView username;
             public TextView score;
+            public TextView rank;
             public ViewHolder(View v) {
                 super(v);
-                username = (TextView) v.findViewById(R.id.username);
-                score = (TextView) v.findViewById(R.id.score);
+                username = (TextView) v.findViewById(R.id.rank_item_username);
+                score = (TextView) v.findViewById(R.id.rank_item_score);
+                rank = (TextView) v.findViewById(R.id.rank_item_rank);
             }
         }
-        public RankingsAdapter(User[] users) {
+        public RankingsAdapter(ArrayList<User> users) {
             this.users = users;
         }
         @Override
@@ -45,15 +49,16 @@ public class RankingsActivity extends AppCompatActivity {
         }
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            if (users[position] == null) {
+            if (users.get(position) == null) {
                 return;
             }
-            holder.username.setText(users[position].getName());
-            holder.score.setText(users[position].getScore());
+            holder.username.setText(users.get(position).getName());
+            holder.score.setText(Integer.toString(users.get(position).getScore()));
+            holder.rank.setText(Integer.toString(position + 1));
         }
         @Override
         public int getItemCount() {
-            return users.length;
+            return users.size();
         }
     }
 
@@ -63,7 +68,7 @@ public class RankingsActivity extends AppCompatActivity {
     protected RecyclerView mRecyclerView;
     protected RecyclerView.LayoutManager mLayoutManager;
     protected RecyclerView.Adapter mAdapter;
-    private User[] users = new User[10];
+    private ArrayList<User> users = new ArrayList<User>(0);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,7 +105,7 @@ public class RankingsActivity extends AppCompatActivity {
                 int i = 0;
                 for (DataSnapshot child : dataSnapshot.getChildren()) {
                     User user = mapper.convertValue(child.getValue(), User.class);
-                    users[i] = user;
+                    users.add(user);
                     i++;
                     mAdapter.notifyDataSetChanged();
                 }

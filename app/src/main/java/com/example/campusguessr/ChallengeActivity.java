@@ -9,11 +9,15 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.example.campusguessr.POJOs.Attempt;
+import com.example.campusguessr.POJOs.Challenge;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.example.campusguessr.POJOs.Challenge;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -28,11 +32,24 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.Future;
 
 public class ChallengeActivity extends AppCompatActivity {
+    String TAG = "ChallengeActivity";
+    int guessesMade = 0;
     private FusedLocationProviderClient fusedLocationClient;
     private double[] currentCoords;
     private Challenge currentChallenge;
@@ -93,6 +110,8 @@ public class ChallengeActivity extends AppCompatActivity {
                 getLocation();
             }
         });
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mAuth = FirebaseAuth.getInstance();
     }
 
     /**
@@ -119,12 +138,30 @@ public class ChallengeActivity extends AppCompatActivity {
                             double distance_latitude = (currentCoords[0]- challengeLocation.getLatitude())*364000;
                             double distance_longitude = (currentCoords[1]-challengeLocation.getLongitude())*288200;
                             double distance = Math.sqrt(distance_latitude*distance_latitude+distance_longitude*distance_longitude);
-                            if (distance < 50) {
-                                startActivity(new Intent(getApplicationContext(), CompleteChallengeActivity.class));
-                            }
+
                             guesses.add("You are " + distance + " feet away!");
                             guessLocations.add(location);
                             adapter.notifyItemInserted(guesses.size()-1);
+
+                            if (distance < 50) {
+                                Toast.makeText(ChallengeActivity.this, "You won!", Toast.LENGTH_SHORT).show();
+                                // covert guessLocations to com.example.campusguessr.POJOs.Location[]
+                                com.example.campusguessr.POJOs.Location[] guessesMade = new com.example.campusguessr.POJOs.Location[guessLocations.size()];
+                                for (int i = 0; i < guessLocations.size(); i++) {
+                                    guessesMade[i] = new com.example.campusguessr.POJOs.Location(guessLocations.get(i).getLatitude(), guessLocations.get(i).getLongitude());
+                                }
+                                submitChallenge(currentChallenge.getId().toString(), guessesMade, 0).handle((result, error) -> {
+                                    if (error != null) {
+                                        Toast.makeText(ChallengeActivity.this, "Challenge submission failed!", Toast.LENGTH_SHORT).show();
+                                        return null;
+                                    }
+                                    if (result != null) {
+                                        Toast.makeText(ChallengeActivity.this, "Challenge submitted!", Toast.LENGTH_SHORT).show();
+                                        startActivity(new Intent(getApplicationContext(), CompleteChallengeActivity.class));
+                                    }
+                                    return null;
+                                });
+                            }
                         }
                     }
                 });
@@ -146,8 +183,76 @@ public class ChallengeActivity extends AppCompatActivity {
                     DataSnapshot dataSnapshot = task.getResult();
                     DataSnapshot childSnap = dataSnapshot.getChildren().iterator().next();
                     currentChallenge = new ObjectMapper().convertValue(childSnap.getValue(), Challenge.class);
+                    Log.d(TAG, "onComplete: " + currentChallenge.toString());
                 }
             }
         });
+    }
+
+    public CompletableFuture<Challenge> submitChallenge(String challengeId, com.example.campusguessr.POJOs.Location[] guesses, int playtime) {
+        CompletableFuture<Challenge> f = new CompletableFuture<>();
+        mDatabase.child("challenges").child(challengeId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DataSnapshot ds = task.getResult();
+                if (ds.exists()) {
+                    Map m = (Map<String, Object>) ds.getValue();
+                    ObjectMapper mapper = new ObjectMapper();
+                    Challenge challenge = mapper.convertValue(m, Challenge.class);
+                    Integer distance = challenge.getLocation().distanceTo(guesses[0]);
+                    int myScore = distance / guesses.length;
+                    String uId = mAuth.getCurrentUser().getUid();
+                    Date currentTime = Calendar.getInstance().getTime();
+                    Log.d(TAG, "submitChallenge: " + myScore);
+
+                    // Create new Attempt object and upload
+                    Attempt attempt = new Attempt(UUID.randomUUID().toString(), challengeId, uId, guesses, currentTime);
+                    Map attMap = new ObjectMapper().convertValue(attempt, Map.class);
+                    mDatabase.child("attempt")
+                            .child(attempt.getId())
+                            .setValue(attMap);
+
+                    mDatabase.child("attempt-by-user")
+                            .child(uId)
+                            .push()
+                            .setValue(attempt.getId());
+
+                    mDatabase.child("attempt-by-challenge")
+                            .child(challengeId)
+                            .push()
+                            .setValue(attempt.getId());
+
+                    DatabaseReference scoreRef = mDatabase.child("users")
+                            .child(uId)
+                            .child("score");
+                    scoreRef
+                            .get()
+                            .addOnCompleteListener(task2 -> {
+                                if (task2.isSuccessful()) {
+                                    DataSnapshot ds2 = task2.getResult();
+                                    if (ds2 != null && ds2.getValue() != null) {
+                                        int score = ds2.getValue(Integer.class);
+                                        scoreRef.setValue(score + myScore);
+                                    } else {
+                                        scoreRef.setValue(myScore);
+                                    }
+                                    Toast.makeText(this, "Submitted Challenge", Toast.LENGTH_SHORT).show();
+                                    f.complete(challenge);
+                                } else {
+                                    Log.d(TAG, "submitChallenge: failed to get score");
+                                    throw new CompletionException(task.getException());
+                                }
+                            });
+                } else {
+                    Toast.makeText(this, "challenge does not exist", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "submitChallenge: challenge does not exist");
+                    throw new CompletionException(new Exception("challenge does not exist"));
+                }
+            } else {
+                Log.d(TAG, "submitChallenge: failed to get challenge");
+                throw new CompletionException(task.getException());
+            }
+        });
+
+        return f;
     }
 }
