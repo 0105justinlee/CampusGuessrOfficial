@@ -59,7 +59,7 @@ public class ProfileActivity extends AppCompatActivity {
         username.setText(userId);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        Query myChallengesQuery = mDatabase.child("challenges");
+        Query myChallengesQuery = mDatabase.child("challenges").orderByChild("createdBy").equalTo(userId);
         myChallengesQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -67,20 +67,14 @@ public class ProfileActivity extends AppCompatActivity {
                 for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                     // TODO: handle the post
                     //Toast.makeText(getBaseContext(), "processing postsnapshot", Toast.LENGTH_SHORT).show();
-                    String currentChallengeCreatedBy = (String)postSnapshot.child("createdBy").getValue();
+                    ArrayList<String> challengeInfo = new ArrayList<String>();
+                    // arraylist -> title, description, photo_link
+                    challengeInfo.add((String)postSnapshot.child("name").getValue());
+                    challengeInfo.add((String)postSnapshot.child("description").getValue());
+                    challengeInfo.add((String)postSnapshot.child("imageURL").getValue());
 
-                    // make sure the userId of the current challenge matches the userId
-                    // i.e. finding the user's challenges
-                    if (currentChallengeCreatedBy.equals(userId)) {
-                        ArrayList<String> challengeInfo = new ArrayList<String>();
-                        // arraylist -> title, description, photo_link
-                        challengeInfo.add((String)postSnapshot.child("name").getValue());
-                        challengeInfo.add((String)postSnapshot.child("description").getValue());
-                        challengeInfo.add((String)postSnapshot.child("imageURL").getValue());
-
-                        String challengeId = (String)postSnapshot.getKey();
-                        myChallenges.put(challengeId, challengeInfo);
-                    }
+                    String challengeId = (String)postSnapshot.getKey();
+                    myChallenges.put(challengeId, challengeInfo);
                 }
                 System.out.println(myChallenges.toString());
             }
