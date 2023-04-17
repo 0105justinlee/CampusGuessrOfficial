@@ -44,6 +44,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.Future;
 
 public class ChallengeActivity extends AppCompatActivity {
@@ -59,10 +60,6 @@ public class ChallengeActivity extends AppCompatActivity {
     private FirebaseStorage storage;
     private DatabaseReference mDatabase;
     ArrayList<Location> guessLocations; // Locations for mapping player path
-    GuessAdapter adapter;
-
-    private DatabaseReference mDatabase;
-    private FirebaseAuth mAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -141,16 +138,30 @@ public class ChallengeActivity extends AppCompatActivity {
                             double distance_latitude = (currentCoords[0]- challengeLocation.getLatitude())*364000;
                             double distance_longitude = (currentCoords[1]-challengeLocation.getLongitude())*288200;
                             double distance = Math.sqrt(distance_latitude*distance_latitude+distance_longitude*distance_longitude);
+
+                            guesses.add("You are " + distance + " feet away!");
+                            guessLocations.add(location);
+                            adapter.notifyItemInserted(guesses.size()-1);
+
                             if (distance < 50) {
                                 Toast.makeText(ChallengeActivity.this, "You won!", Toast.LENGTH_SHORT).show();
                                 // covert guessLocations to com.example.campusguessr.POJOs.Location[]
                                 com.example.campusguessr.POJOs.Location[] guessesMade = new com.example.campusguessr.POJOs.Location[guessLocations.size()];
-                                submitChallenge("test", guessesMade, 0);
-                                startActivity(new Intent(getApplicationContext(), CompleteChallengeActivity.class));
+                                for (int i = 0; i < guessLocations.size(); i++) {
+                                    guessesMade[i] = new com.example.campusguessr.POJOs.Location(guessLocations.get(i).getLatitude(), guessLocations.get(i).getLongitude());
+                                }
+                                submitChallenge(currentChallenge.getId().toString(), guessesMade, 0).handle((result, error) -> {
+                                    if (error != null) {
+                                        Toast.makeText(ChallengeActivity.this, "Challenge submission failed!", Toast.LENGTH_SHORT).show();
+                                        return null;
+                                    }
+                                    if (result != null) {
+                                        Toast.makeText(ChallengeActivity.this, "Challenge submitted!", Toast.LENGTH_SHORT).show();
+                                        startActivity(new Intent(getApplicationContext(), CompleteChallengeActivity.class));
+                                    }
+                                    return null;
+                                });
                             }
-                            guesses.add("You are " + distance + " feet away!");
-                            guessLocations.add(location);
-                            adapter.notifyItemInserted(guesses.size()-1);
                         }
                     }
                 });
@@ -172,13 +183,13 @@ public class ChallengeActivity extends AppCompatActivity {
                     DataSnapshot dataSnapshot = task.getResult();
                     DataSnapshot childSnap = dataSnapshot.getChildren().iterator().next();
                     currentChallenge = new ObjectMapper().convertValue(childSnap.getValue(), Challenge.class);
+                    Log.d(TAG, "onComplete: " + currentChallenge.toString());
                 }
             }
         });
     }
 
-    public Future<Challenge> submitChallenge(String challengeId, com.example.campusguessr.POJOs.Location[] guesses, int playtime) {
-        CompletableFuture<Challenge> f2 = new CompletableFuture<>();
+    public CompletableFuture<Challenge> submitChallenge(String challengeId, com.example.campusguessr.POJOs.Location[] guesses, int playtime) {
         CompletableFuture<Challenge> f = new CompletableFuture<>();
         mDatabase.child("challenges").child(challengeId).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -187,63 +198,61 @@ public class ChallengeActivity extends AppCompatActivity {
                     Map m = (Map<String, Object>) ds.getValue();
                     ObjectMapper mapper = new ObjectMapper();
                     Challenge challenge = mapper.convertValue(m, Challenge.class);
-                    f.complete(challenge);
+                    Integer distance = challenge.getLocation().distanceTo(guesses[0]);
+                    int myScore = distance / guesses.length;
+                    String uId = mAuth.getCurrentUser().getUid();
+                    Date currentTime = Calendar.getInstance().getTime();
+                    Log.d(TAG, "submitChallenge: " + myScore);
+
+                    // Create new Attempt object and upload
+                    Attempt attempt = new Attempt(UUID.randomUUID().toString(), challengeId, uId, guesses, currentTime);
+                    Map attMap = new ObjectMapper().convertValue(attempt, Map.class);
+                    mDatabase.child("attempt")
+                            .child(attempt.getId())
+                            .setValue(attMap);
+
+                    mDatabase.child("attempt-by-user")
+                            .child(uId)
+                            .push()
+                            .setValue(attempt.getId());
+
+                    mDatabase.child("attempt-by-challenge")
+                            .child(challengeId)
+                            .push()
+                            .setValue(attempt.getId());
+
+                    DatabaseReference scoreRef = mDatabase.child("users")
+                            .child(uId)
+                            .child("score");
+                    scoreRef
+                            .get()
+                            .addOnCompleteListener(task2 -> {
+                                if (task2.isSuccessful()) {
+                                    DataSnapshot ds2 = task2.getResult();
+                                    if (ds2 != null && ds2.getValue() != null) {
+                                        int score = ds2.getValue(Integer.class);
+                                        scoreRef.setValue(score + myScore);
+                                    } else {
+                                        scoreRef.setValue(myScore);
+                                    }
+                                    Toast.makeText(this, "Submitted Challenge", Toast.LENGTH_SHORT).show();
+                                    f.complete(challenge);
+                                } else {
+                                    Log.d(TAG, "submitChallenge: failed to get score");
+                                    throw new CompletionException(task.getException());
+                                }
+                            });
                 } else {
                     Toast.makeText(this, "challenge does not exist", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "submitChallenge: challenge does not exist");
-                    f.cancel(false);
+                    throw new CompletionException(new Exception("challenge does not exist"));
                 }
             } else {
                 Log.d(TAG, "submitChallenge: failed to get challenge");
-                f.cancel(true);
+                throw new CompletionException(task.getException());
             }
         });
 
-        f.thenAccept(challenge -> {
-            Integer distance = challenge.getLocation().distanceTo(guesses[guesses.length - 1]);
-            int myScore = distance / guesses.length;
-            String uId = mAuth.getCurrentUser().getUid();
-            Date currentTime = Calendar.getInstance().getTime();
-
-            // Create new Attempt object and upload
-            Attempt attempt = new Attempt(UUID.randomUUID().toString(), challengeId, uId, guesses, currentTime);
-            Map attMap = new ObjectMapper().convertValue(attempt, Map.class);
-            mDatabase.child("attempt")
-                    .child(attempt.getId())
-                    .setValue(attMap);
-
-            mDatabase.child("attempt-by-user")
-                    .child(uId)
-                    .push()
-                    .setValue(attempt.getId());
-
-            mDatabase.child("attempt-by-challenge")
-                    .child(challengeId)
-                    .push()
-                    .setValue(attempt.getId());
-
-            DatabaseReference scoreRef = mDatabase.child("users")
-                    .child(uId)
-                    .child("score");
-            scoreRef
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            DataSnapshot ds = task.getResult();
-                            if (ds != null && ds.getValue() != null) {
-                                int score = ds.getValue(Integer.class);
-                                scoreRef.setValue(score + myScore);
-                            } else {
-                                scoreRef.setValue(myScore);
-                            }
-                            Toast.makeText(this, "Submitted Challenge", Toast.LENGTH_SHORT).show();
-                            f2.complete(challenge);
-                        } else {
-                            Log.d(TAG, "submitChallenge: failed to get score");
-                            f2.cancel(true);
-                        }
-                    });
-        });
-        return f2;
+        return f;
     }
 }
