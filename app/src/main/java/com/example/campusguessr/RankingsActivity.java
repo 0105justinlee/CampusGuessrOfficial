@@ -53,7 +53,7 @@ public class RankingsActivity extends AppCompatActivity {
                 return;
             }
             holder.username.setText(users.get(position).getName());
-            holder.score.setText(Integer.toString(users.get(position).getScore()));
+            holder.score.setText(Long.toString(users.get(position).getScore()));
             holder.rank.setText(Integer.toString(position + 1));
         }
         @Override
