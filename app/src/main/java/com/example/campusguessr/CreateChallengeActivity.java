@@ -19,8 +19,11 @@ import com.example.campusguessr.POJOs.Location;
 import com.example.campusguessr.POJOs.Orientation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -93,6 +96,15 @@ public class CreateChallengeActivity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
             }
         });
+
+        // Keep title and description the same when activity recreated due to duplicate detection
+        if(savedInstanceState != null) {
+            String editTextString = savedInstanceState.getString("titleText");
+            titleText.setText(editTextString);
+
+            editTextString = savedInstanceState.getString("descriptionText");
+            descriptionText.setText(editTextString);
+        }
     }
 
     @Override
@@ -100,8 +112,16 @@ public class CreateChallengeActivity extends AppCompatActivity {
         super.onStart();
     }
 
+    // Save instances in editText fields in case of activity recreation
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("titleText", titleText.getText().toString());
+        outState.putString("descriptionText", descriptionText.getText().toString());
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
         Bundle extras = intent.getExtras();
         if (resultCode == RESULT_OK) {
             location = extras.getDoubleArray("location");
@@ -112,6 +132,16 @@ public class CreateChallengeActivity extends AppCompatActivity {
             photoPathText.setText("Photo Path: " + photoPath);
             photoView.setImageURI(Uri.parse(photoPath));
         }
+
+         // Called after user presses the button from DuplicateDetectActivity
+        if (requestCode == 1) {
+            if (resultCode == Activity.RESULT_OK) {
+                // User pressed "yes": restart the current activity
+                recreate();
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                // User pressed "no": continue with the activity here
+            }
+        }
     }
 
     public void CapturePhoto(View view) {
@@ -120,6 +150,8 @@ public class CreateChallengeActivity extends AppCompatActivity {
     }
 
     public void submit(View view) {
+        checkDuplicate();
+
         Challenge c1 = new Challenge();
         c1.setId(UUID.randomUUID());
         c1.setCreatedAt(new Date());
@@ -155,6 +187,87 @@ public class CreateChallengeActivity extends AppCompatActivity {
             startActivityForResult(intent, 0);
         }).addOnFailureListener(e -> {
             Toast.makeText(this, "Upload failed", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    // Calculate orientation diff
+    private double angleDiff(float[] orientationValues, double X, double Y, double Z) {
+        double deltaAzimuth = Math.abs(Math.toDegrees(orientationValues[0]) - X);
+        double deltaPitch = Math.abs(Math.toDegrees(orientationValues[1]) - Y);
+        double deltaRoll = Math.abs(Math.toDegrees(orientationValues[2]) - Z);
+
+        double angleDiff = Math.sqrt(Math.pow(deltaAzimuth, 2) + Math.pow(deltaPitch, 2) + Math.pow(deltaRoll, 2));
+        return angleDiff;
+    }
+
+    // Calculate distance diff
+    private double distance(double lat1, double lon1, double lat2, double lon2) {
+        double R = 6371; // Earth's radius in kilometers
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = R * c; // Distance in kilometers
+        return distance;
+    }
+
+    /*
+     * Method to check duplicate and open duplicate detect activity
+     */
+    private void checkDuplicate() {
+        // Get a reference to the Firebase Realtime Database
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
+        String usernameString = mAuth.getCurrentUser().getDisplayName();
+        String userId = mAuth.getCurrentUser().getUid();
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference dbRef = database.getReference().child("challenges");
+
+        // Retrieve data from the database
+        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Loop through each child node
+                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                    // Retrieve the child's key and data
+                    String childKey = childSnapshot.getKey();
+
+                    // Location variables
+                    double curLatitude =
+                            Double.parseDouble(childSnapshot.child("location").child("latitude").getValue().toString());
+                    double curLongitude =
+                            Double.parseDouble(childSnapshot.child("location").child("longitude").getValue().toString());
+                    // Calculate the distance between the current coordinates and the coordinates in the database
+                    double distance = distance(location[0], location[1], curLatitude, curLongitude);
+                    double LOCATION_THRESHOLD = 0.2;  // 200 meters -> Can modify
+
+                    // Orientation variables
+                    float curX = Float.parseFloat(childSnapshot.child("orientation").child("x").getValue().toString());
+                    float curY = Float.parseFloat(childSnapshot.child("orientation").child("y").getValue().toString());
+                    float curZ = Float.parseFloat(childSnapshot.child("orientation").child("z").getValue().toString());
+                    float ANGLE_THRESHOLD = 10.0f; // 10 degrees -> Can modify
+                    // Calculate the difference in orientation between the current and database values
+                    double angleDiff = angleDiff(orientation, curX, curY, curZ);
+
+                    // if duplicate suspected
+                    if (distance < LOCATION_THRESHOLD && angleDiff < ANGLE_THRESHOLD) {
+                        // Move to duplicate detect activity
+                        Intent intent = new Intent(getApplicationContext(), DuplicateDetectActivity.class);
+                        intent.putExtra("Duplicate Picture", childKey);
+                        intent.putExtra("photoPath", photoPath);
+                        startActivityForResult(intent, 1);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle any errors
+                System.out.println("Database error: " + databaseError.getMessage());
+            }
         });
     }
 }

@@ -182,6 +182,7 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
 
                 /////// image capture ///////
                 File file = new File(getFilesDir() + "/" + System.currentTimeMillis() + ".jpg");
+
                 imgCap.takePicture(file, new ImageCapture.OnImageSavedListener() {
                     @Override
                     public void onImageSaved(@NonNull File file) {
@@ -228,105 +229,7 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
         CameraX.bindToLifecycle((LifecycleOwner) this, analysis, imgCap, preview);
     }
 
-    // Calculate orientation diff
-    private double angleDiff(float[] orientationValues, double X, double Y, double Z) {
-        double deltaAzimuth = Math.abs(Math.toDegrees(orientationValues[0]) - X);
-        double deltaPitch = Math.abs(Math.toDegrees(orientationValues[1]) - Y);
-        double deltaRoll = Math.abs(Math.toDegrees(orientationValues[2]) - Z);
 
-        double angleDiff = Math.sqrt(Math.pow(deltaAzimuth, 2) + Math.pow(deltaPitch, 2) + Math.pow(deltaRoll, 2));
-        return angleDiff;
-    }
-
-    // Calculate distance diff
-    private double distance(double lat1, double lon1, double lat2, double lon2) {
-        double R = 6371; // Earth's radius in kilometers
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLon = Math.toRadians(lon2 - lon1);
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double distance = R * c; // Distance in kilometers
-        return distance;
-    }
-
-    /*
-     * Method that performs depending on duplicate detected or not
-     *
-     * Called after user presses the button from DuplicateDetectActivity
-     */
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == 1) {
-            if (resultCode == Activity.RESULT_OK) {
-                // User pressed "yes": restart the current activity
-                recreate();
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                // User pressed "no": continue with the activity here
-            }
-        }
-    }
-
-    /*
-     * Method to check duplicate and open duplicate detect activity
-     */
-    private void checkDuplicate(File file, float[] orientationValues) {
-        // Get a reference to the Firebase Realtime Database
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-
-        String usernameString = mAuth.getCurrentUser().getDisplayName();
-        String userId = mAuth.getCurrentUser().getUid();
-
-        database = FirebaseDatabase.getInstance();
-        dbRef = database.getReference().child("challenges");
-
-        // Retrieve data from the database
-        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // Loop through each child node
-                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-                    // Retrieve the child's key and data
-                    String childKey = childSnapshot.getKey();
-
-                    // Location variables
-                    double curLatitude =
-                            Double.parseDouble(childSnapshot.child("location").child("latitude").getValue().toString());
-                    double curLongitude =
-                            Double.parseDouble(childSnapshot.child("location").child("longitude").getValue().toString());
-                    // Calculate the distance between the current coordinates and the coordinates in the database
-                    double distance = distance(currentCoords[0], currentCoords[1], curLatitude, curLongitude);
-                    double LOCATION_THRESHOLD = 0.2;  // 200 meters -> Can modify
-
-                    // Orientation variables
-                    float curX = Float.parseFloat(childSnapshot.child("orientation").child("x").getValue().toString());
-                    float curY = Float.parseFloat(childSnapshot.child("orientation").child("y").getValue().toString());
-                    float curZ = Float.parseFloat(childSnapshot.child("orientation").child("z").getValue().toString());
-                    float ANGLE_THRESHOLD = 10.0f; // 10 degrees -> Can modify
-                    // Calculate the difference in orientation between the current and database values
-                    double angleDiff = angleDiff(orientationValues, curX, curY, curZ);
-
-                    // if duplicate suspected
-                    if (distance < LOCATION_THRESHOLD && angleDiff < ANGLE_THRESHOLD) {
-                        // Move to duplicate detect activity
-                        Intent intent = new Intent(getApplicationContext(), DuplicateDetectActivity.class);
-                        intent.putExtra("Duplicate Picture", childKey);
-                        intent.putExtra("photoPath", file.getAbsolutePath());
-                        startActivityForResult(intent, 1);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Handle any errors
-                System.out.println("Database error: " + databaseError.getMessage());
-            }
-        });
-    }
 
     private void updateTransform() {
         /*
