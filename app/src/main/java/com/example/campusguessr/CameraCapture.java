@@ -1,5 +1,6 @@
 package com.example.campusguessr;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Matrix;
@@ -10,6 +11,7 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.util.Rational;
 import android.util.Size;
 import android.view.Surface;
@@ -37,9 +39,18 @@ import androidx.lifecycle.LifecycleOwner;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
+import java.util.UUID;
 
 
 //source: https://codelabs.developers.google.com/codelabs/camerax-getting-started/
@@ -61,6 +72,12 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
     TextureView txView;
     TextView locationText;
     TextView orientationText;
+
+
+    // Duplicate detect fields
+    FirebaseDatabase database;
+    DatabaseReference dbRef;
+
 
     public CameraCapture() {
     }
@@ -113,7 +130,8 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
         Size screen = new Size(aspRatioW, aspRatioH); //size of the screen
 
         //config obj for preview/viewfinder thingy.
-        PreviewConfig pConfig = new PreviewConfig.Builder().setTargetAspectRatio(asp).setTargetResolution(screen).build();
+        PreviewConfig pConfig =
+                new PreviewConfig.Builder().setTargetAspectRatio(asp).setTargetResolution(screen).build();
         Preview preview = new Preview(pConfig); //lets build it
 
         preview.setOnPreviewOutputUpdateListener(
@@ -133,7 +151,8 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
         /* image capture */
 
         //config obj, selected capture mode
-        ImageCaptureConfig imgCapConfig = new ImageCaptureConfig.Builder().setCaptureMode(ImageCapture.CaptureMode.MIN_LATENCY)
+        ImageCaptureConfig imgCapConfig =
+                new ImageCaptureConfig.Builder().setCaptureMode(ImageCapture.CaptureMode.MIN_LATENCY)
                 .setTargetRotation(getWindowManager().getDefaultDisplay().getRotation()).build();
         final ImageCapture imgCap = new ImageCapture(imgCapConfig);
 
@@ -153,7 +172,7 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
                 float[] orientationValues = new float[3];
                 float[] rotationMatrix = new float[9];
                 SensorManager.getRotationMatrix(rotationMatrix, null, acc_event.values, mag_event.values);
-                SensorManager.getOrientation(rotationMatrix,orientationValues);
+                SensorManager.getOrientation(rotationMatrix, orientationValues);
                 // note: orientationValues[0] is azimuth, which is the "absolute heading of yaw"
                 // orientationValues[1] is pitch
                 // orientationValues[2] is roll
@@ -179,7 +198,8 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
                     }
 
                     @Override
-                    public void onError(@NonNull ImageCapture.UseCaseError useCaseError, @NonNull String message, @Nullable Throwable cause) {
+                    public void onError(@NonNull ImageCapture.UseCaseError useCaseError, @NonNull String message,
+                                        @Nullable Throwable cause) {
                         String msg = "Photo capture failed: " + message;
                         Toast.makeText(getBaseContext(), msg, Toast.LENGTH_LONG).show();
                         if (cause != null) {
@@ -192,7 +212,8 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
 
         /* image analyser */
 
-        ImageAnalysisConfig imgAConfig = new ImageAnalysisConfig.Builder().setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE).build();
+        ImageAnalysisConfig imgAConfig =
+                new ImageAnalysisConfig.Builder().setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE).build();
         ImageAnalysis analysis = new ImageAnalysis(imgAConfig);
 
         analysis.setAnalyzer(
@@ -205,6 +226,106 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
 
         //bind to lifecycle:
         CameraX.bindToLifecycle((LifecycleOwner) this, analysis, imgCap, preview);
+    }
+
+    // Calculate orientation diff
+    private double angleDiff(float[] orientationValues, double X, double Y, double Z) {
+        double deltaAzimuth = Math.abs(Math.toDegrees(orientationValues[0]) - X);
+        double deltaPitch = Math.abs(Math.toDegrees(orientationValues[1]) - Y);
+        double deltaRoll = Math.abs(Math.toDegrees(orientationValues[2]) - Z);
+
+        double angleDiff = Math.sqrt(Math.pow(deltaAzimuth, 2) + Math.pow(deltaPitch, 2) + Math.pow(deltaRoll, 2));
+        return angleDiff;
+    }
+
+    // Calculate distance diff
+    private double distance(double lat1, double lon1, double lat2, double lon2) {
+        double R = 6371; // Earth's radius in kilometers
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = R * c; // Distance in kilometers
+        return distance;
+    }
+
+    /*
+     * Method that performs depending on duplicate detected or not
+     *
+     * Called after user presses the button from DuplicateDetectActivity
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1) {
+            if (resultCode == Activity.RESULT_OK) {
+                // User pressed "yes": restart the current activity
+                recreate();
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                // User pressed "no": continue with the activity here
+            }
+        }
+    }
+
+    /*
+     * Method to check duplicate and open duplicate detect activity
+     */
+    private void checkDuplicate(File file, float[] orientationValues) {
+        // Get a reference to the Firebase Realtime Database
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
+        String usernameString = mAuth.getCurrentUser().getDisplayName();
+        String userId = mAuth.getCurrentUser().getUid();
+
+        database = FirebaseDatabase.getInstance();
+        dbRef = database.getReference().child("challenges");
+
+        // Retrieve data from the database
+        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Loop through each child node
+                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                    // Retrieve the child's key and data
+                    String childKey = childSnapshot.getKey();
+
+                    // Location variables
+                    double curLatitude =
+                            Double.parseDouble(childSnapshot.child("location").child("latitude").getValue().toString());
+                    double curLongitude =
+                            Double.parseDouble(childSnapshot.child("location").child("longitude").getValue().toString());
+                    // Calculate the distance between the current coordinates and the coordinates in the database
+                    double distance = distance(currentCoords[0], currentCoords[1], curLatitude, curLongitude);
+                    double LOCATION_THRESHOLD = 0.2;  // 200 meters -> Can modify
+
+                    // Orientation variables
+                    float curX = Float.parseFloat(childSnapshot.child("orientation").child("x").getValue().toString());
+                    float curY = Float.parseFloat(childSnapshot.child("orientation").child("y").getValue().toString());
+                    float curZ = Float.parseFloat(childSnapshot.child("orientation").child("z").getValue().toString());
+                    float ANGLE_THRESHOLD = 10.0f; // 10 degrees -> Can modify
+                    // Calculate the difference in orientation between the current and database values
+                    double angleDiff = angleDiff(orientationValues, curX, curY, curZ);
+
+                    // if duplicate suspected
+                    if (distance < LOCATION_THRESHOLD && angleDiff < ANGLE_THRESHOLD) {
+                        // Move to duplicate detect activity
+                        Intent intent = new Intent(getApplicationContext(), DuplicateDetectActivity.class);
+                        intent.putExtra("Duplicate Picture", childKey);
+                        intent.putExtra("photoPath", file.getAbsolutePath());
+                        startActivityForResult(intent, 1);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle any errors
+                System.out.println("Database error: " + databaseError.getMessage());
+            }
+        });
     }
 
     private void updateTransform() {
@@ -244,7 +365,8 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         //start camera when permissions have been granted otherwise exit app
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
@@ -277,7 +399,8 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
         //            @Override
         //            public void onSuccess(Location location) {
         //                if (location != null) {
-        //                    lastCoords = Double.toString(location.getLatitude()) + ", " + Double.toString(location.getLongitude());
+        //                    lastCoords = Double.toString(location.getLatitude()) + ", " + Double.toString(location
+        //                    .getLongitude());
         //                }
         //            }
         //        });
