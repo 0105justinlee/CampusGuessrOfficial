@@ -12,8 +12,7 @@
         android:rotation="90"
         android:layout_width="300dp"
         android:layout_height="300dp"
-        android:layout_marginTop="30dp"
-        app:srcCompat="@drawable/ic_launcher_background" />
+        android:layout_marginTop="30dp" />
 
     <TextView
         android:id="@+id/start_challenge_distance"
