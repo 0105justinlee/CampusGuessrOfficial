@@ -55,8 +55,6 @@ public class CreateChallengeActivity extends AppCompatActivity {
 
         titleText = findViewById(R.id.titleText);
         descriptionText = findViewById(R.id.descriptionText);
-        locOriText = findViewById(R.id.locOriText);
-        photoPathText = findViewById(R.id.photoPathText);
         photoView = findViewById(R.id.photoView);
 
         mAuth = FirebaseAuth.getInstance();
