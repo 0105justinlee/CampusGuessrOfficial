@@ -7,9 +7,20 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 public class MyChallengeAdapter extends RecyclerView.Adapter<MyChallengeAdapter.ViewHolder> {
 
-    private String[] localDataSet;
+    //private String[] localDataSet;
+    // hashmap structure: assume that all of the challenges here are the user's challenges they submitted
+    // challengeid
+    //      -> ArrayList
+    //          -> title
+    //          -> description
+    //          -> photo url
+    Map<String, ArrayList<String>> myChallenges;
 
     /**
      * Provide a reference to the type of views that you are using
@@ -36,8 +47,8 @@ public class MyChallengeAdapter extends RecyclerView.Adapter<MyChallengeAdapter.
      * @param dataSet String[] containing the data to populate views to be used
      *                by RecyclerView
      */
-    public MyChallengeAdapter(String[] dataSet) {
-        localDataSet = dataSet;
+    public MyChallengeAdapter(Map<String, ArrayList<String>> dataSet) {
+        myChallenges = dataSet;
     }
 
     // Create new views (invoked by the layout manager)
@@ -56,12 +67,24 @@ public class MyChallengeAdapter extends RecyclerView.Adapter<MyChallengeAdapter.
 
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
-        viewHolder.getTextView().setText(localDataSet[position]);
+        String text = "";
+        Object key = null;
+
+        List keys = new ArrayList(myChallenges.keySet());
+        for (int i = 0; i < keys.size(); i++) {
+            if (i == position) {
+                key = keys.get(i);
+            }
+        }
+
+        ArrayList<String> valueArray = myChallenges.get(key);
+
+        viewHolder.getTextView().setText(valueArray.get(2));
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return localDataSet.length;
+        return myChallenges.size();
     }
 }

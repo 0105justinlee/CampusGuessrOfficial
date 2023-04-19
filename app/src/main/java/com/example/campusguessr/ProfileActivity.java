@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,6 +43,8 @@ public class ProfileActivity extends AppCompatActivity {
     //          -> photo url
     Map<String, ArrayList<String>> myChallenges = new HashMap<String, ArrayList<String>>();
 
+    MyChallengeAdapter myChallengeAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +61,17 @@ public class ProfileActivity extends AppCompatActivity {
         String userId = mAuth.getCurrentUser().getUid();
         username.setText(userId);
 
+        // TODO: might need to make another recyclerview for my challenges later
+        RecyclerView myChallengesRecycler = findViewById(R.id.recyclerview_recently_played);
+        myChallengesRecycler.setLayoutManager(new LinearLayoutManager(this));
+
+        myChallengeAdapter = new MyChallengeAdapter(myChallenges);
+        myChallengesRecycler.setAdapter(myChallengeAdapter);
+        myChallengesRecycler.setNestedScrollingEnabled(false);
+
         mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        // database query to retrieve user's submitted challenges
         Query myChallengesQuery = mDatabase.child("challenges").orderByChild("createdBy").equalTo(userId);
         myChallengesQuery.addValueEventListener(new ValueEventListener() {
             @Override
@@ -75,6 +88,7 @@ public class ProfileActivity extends AppCompatActivity {
 
                     String challengeId = (String)postSnapshot.getKey();
                     myChallenges.put(challengeId, challengeInfo);
+                    myChallengeAdapter.notifyItemInserted(myChallenges.size() - 1);
                 }
                 System.out.println(myChallenges.toString());
             }
@@ -87,10 +101,6 @@ public class ProfileActivity extends AppCompatActivity {
                 Toast.makeText(getBaseContext(), "Failed to retrieve challenges", Toast.LENGTH_SHORT).show();
             }
         });
-
-        RecyclerView myChallengesRecycler = findViewById(R.id.recyclerview_recently_played);
-        myChallengesRecycler.setLayoutManager(new LinearLayoutManager(this));
-
 
         RankingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
