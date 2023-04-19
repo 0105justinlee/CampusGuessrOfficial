@@ -59,7 +59,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         String usernameString = mAuth.getCurrentUser().getDisplayName();
         String userId = mAuth.getCurrentUser().getUid();
-        username.setText(userId);
+        username.setText(usernameString);
 
         // TODO: might need to make another recyclerview for my challenges later
         RecyclerView myChallengesRecycler = findViewById(R.id.recyclerview_recently_played);
