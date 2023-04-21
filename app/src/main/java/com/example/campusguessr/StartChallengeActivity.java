@@ -49,6 +49,7 @@ public class StartChallengeActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         getChallenge();
         Button startChallengeButton = (Button) findViewById(R.id.start_challenge_button);
+        Button rerollButton = findViewById(R.id.reroll_button);
         ImageButton rankingsButton = (ImageButton) findViewById(R.id.navigate_ranking_tab_button);
         ImageButton createButton = (ImageButton) findViewById(R.id.navigate_create_tab_button);
         ImageButton profileButton = (ImageButton) findViewById(R.id.navigate_profile_tab_button);
@@ -58,6 +59,12 @@ public class StartChallengeActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), ChallengeActivity.class);
                 intent.putExtra("challenge", String.valueOf(challengeObj));
                 startActivity(intent);
+            }
+        });
+        rerollButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getChallenge();
             }
         });
         createButton.setOnClickListener(new View.OnClickListener() {
