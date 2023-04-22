@@ -3,9 +3,12 @@ package com.example.campusguessr;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,16 +31,22 @@ public class MyChallengeAdapter extends RecyclerView.Adapter<MyChallengeAdapter.
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView textView;
+        private final ImageView imageView;
 
         public ViewHolder(View view) {
             super(view);
             // Define click listener for the ViewHolder's View
 
             textView = (TextView) view.findViewById(R.id.textView);
+            imageView = view.findViewById(R.id.my_challenge_image);
         }
 
         public TextView getTextView() {
             return textView;
+        }
+
+        public ImageView getImageView() {
+            return imageView;
         }
     }
 
@@ -56,7 +65,7 @@ public class MyChallengeAdapter extends RecyclerView.Adapter<MyChallengeAdapter.
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         // Create a new view, which defines the UI of the list item
         View view = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.recycler_text_item, viewGroup, false);
+                .inflate(R.layout.recyclerview_mychallenges, viewGroup, false);
 
         return new ViewHolder(view);
     }
@@ -78,8 +87,9 @@ public class MyChallengeAdapter extends RecyclerView.Adapter<MyChallengeAdapter.
         }
 
         ArrayList<String> valueArray = myChallenges.get(key);
+        Picasso.get().load(valueArray.get(2)).rotate(90f).resize(800,1000).centerCrop().into(viewHolder.getImageView());
+        //viewHolder.getTextView().setText(valueArray.get(2));
 
-        viewHolder.getTextView().setText(valueArray.get(2));
     }
 
     // Return the size of your dataset (invoked by the layout manager)

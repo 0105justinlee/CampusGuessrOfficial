@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:id="@+id/layout"
         android:layout_height="match_parent"
-        android:paddingBottom="30dp">
+        android:paddingBottom="100dp">
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -96,7 +96,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/recent_played" />
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerview_recently_played"
+                    android:id="@+id/recyclerview_my_challenges"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="20dp"
