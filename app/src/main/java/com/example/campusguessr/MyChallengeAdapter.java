@@ -1,11 +1,18 @@
 package com.example.campusguessr;
 
+import android.content.Context;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.view.WindowManager;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
@@ -31,23 +38,27 @@ public class MyChallengeAdapter extends RecyclerView.Adapter<MyChallengeAdapter.
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView textView;
-        private final ImageView imageView;
+        private final ImageButton imageButton;
+        private final ImageButton popupImage;
 
         public ViewHolder(View view) {
             super(view);
             // Define click listener for the ViewHolder's View
 
             textView = (TextView) view.findViewById(R.id.textView);
-            imageView = view.findViewById(R.id.my_challenge_image);
+            imageButton = view.findViewById(R.id.my_challenge_image);
+            popupImage = view.findViewById(R.id.popup_delete_image);
         }
 
         public TextView getTextView() {
             return textView;
         }
 
-        public ImageView getImageView() {
-            return imageView;
+        public ImageButton getImageButton() {
+            return imageButton;
         }
+
+        public ImageButton getPopupImage() { return popupImage; }
     }
 
     /**
@@ -87,8 +98,49 @@ public class MyChallengeAdapter extends RecyclerView.Adapter<MyChallengeAdapter.
         }
 
         ArrayList<String> valueArray = myChallenges.get(key);
-        Picasso.get().load(valueArray.get(2)).rotate(90f).resize(800,1000).centerCrop().into(viewHolder.getImageView());
+        Picasso.get().load(valueArray.get(2)).rotate(90f).resize(800,1000).centerCrop().into(viewHolder.getImageButton());
         //viewHolder.getTextView().setText(valueArray.get(2));
+
+        viewHolder.getImageButton().setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                // inflate the layout of the popup window
+                LayoutInflater inflater = (LayoutInflater)
+                        viewHolder.getImageButton().getContext().getSystemService(viewHolder.getImageButton().getContext().LAYOUT_INFLATER_SERVICE);
+                View popupView = inflater.inflate(R.layout.popup_delete_challenge, null);
+
+                // create the popup window
+                int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+                int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+                boolean focusable = true; // lets taps outside the popup also dismiss it
+                final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+
+                // show the popup window
+                // which view you pass in doesn't matter, it is only used for the window tolken
+                popupWindow.showAtLocation(viewHolder.getImageButton(), Gravity.CENTER, 0, 0);
+
+                // dim background when popup shows up
+                Context context = popupWindow.getContentView().getContext();
+                View container = (View) popupWindow.getContentView().getParent();
+                WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+                WindowManager.LayoutParams p = (WindowManager.LayoutParams) container.getLayoutParams();
+                p.flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+                p.dimAmount = 0.5f;
+                wm.updateViewLayout(container, p);
+
+                ((TextView)popupView.findViewById(R.id.popup_delete_title)).setText(valueArray.get(0));
+                ((TextView)popupView.findViewById(R.id.popup_delete_description)).setText(valueArray.get(1));
+                Picasso.get().load(valueArray.get(2)).rotate(90f).resize(800,800).centerCrop().into((ImageButton) popupView.findViewById(R.id.popup_delete_image));
+
+                // dismiss the popup window when touched
+                popupView.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        popupWindow.dismiss();
+                        return true;
+                    }
+                });
+            }
+        });
 
     }
 
