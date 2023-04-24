@@ -57,10 +57,10 @@ public class DuplicateDetectActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     String imageURL = snapshot.getValue(String.class);
-                    // Use a library like Picasso or Glide to load the image into the actualPhoto ImageView
+                    // Use the Picasso library to load the image into the actualPhoto ImageView
                     Picasso.get().load(imageURL).into(actualPhoto);
                 } else {
-                    // Handle the case where the imageURL does not exist
+                    // ImageURL does not exist
                     Toast.makeText(DuplicateDetectActivity.this, "Image not found", Toast.LENGTH_SHORT).show();
                 }
             }
