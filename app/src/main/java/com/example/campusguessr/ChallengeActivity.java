@@ -30,6 +30,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.Calendar;
@@ -37,6 +38,10 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.var;
 
 public class ChallengeActivity extends AppCompatActivity {
     String TAG = "ChallengeActivity";
@@ -144,7 +149,11 @@ public class ChallengeActivity extends AppCompatActivity {
                                     }
                                     if (result != null) {
                                         Toast.makeText(ChallengeActivity.this, "Challenge submitted!", Toast.LENGTH_SHORT).show();
-                                        startActivity(new Intent(getApplicationContext(), CompleteChallengeActivity.class));
+                                        Bundle challengeInfo = new Bundle();
+                                        challengeInfo.putString("attemptId", result.getId());
+                                        var intent = new Intent(getApplicationContext(), CompleteChallengeActivity.class);
+                                        intent.putExtra("challengeInfo", challengeInfo);
+                                        startActivity(intent);
                                     }
                                     return null;
                                 });
@@ -165,8 +174,8 @@ public class ChallengeActivity extends AppCompatActivity {
         }
     }
 
-    public CompletableFuture<Challenge> submitChallenge(String challengeId, com.example.campusguessr.POJOs.Location[] guesses, int playtime) {
-        CompletableFuture<Challenge> f = new CompletableFuture<>();
+    public CompletableFuture<Attempt> submitChallenge(String challengeId, com.example.campusguessr.POJOs.Location[] guesses, int playtime) {
+        var f = new CompletableFuture<Attempt>();
         mDatabase.child("challenges").child(challengeId).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DataSnapshot ds = task.getResult();
@@ -181,7 +190,7 @@ public class ChallengeActivity extends AppCompatActivity {
                     Log.d(TAG, "submitChallenge: " + myScore);
 
                     // Create new Attempt object and upload
-                    Attempt attempt = new Attempt(UUID.randomUUID().toString(), challengeId, uId, guesses, currentTime);
+                    Attempt attempt = new Attempt(UUID.randomUUID().toString(), uId, challengeId, guesses, myScore, playtime, currentTime);
                     Map attMap = new ObjectMapper().convertValue(attempt, Map.class);
                     mDatabase.child("attempt")
                             .child(attempt.getId())
@@ -212,7 +221,7 @@ public class ChallengeActivity extends AppCompatActivity {
                                         scoreRef.setValue(myScore);
                                     }
                                     Toast.makeText(this, "Submitted Challenge", Toast.LENGTH_SHORT).show();
-                                    f.complete(challenge);
+                                    f.complete(attempt);
                                 } else {
                                     Log.d(TAG, "submitChallenge: failed to get score");
                                     throw new CompletionException(task.getException());
