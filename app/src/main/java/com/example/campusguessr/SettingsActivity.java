@@ -25,6 +25,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.HashMap;
+import java.util.Iterator;
+
 public class SettingsActivity extends AppCompatActivity {
   
   private FirebaseAuth mAuth;
@@ -48,7 +51,7 @@ public class SettingsActivity extends AppCompatActivity {
     
     SeekBar DesiredDistance = (SeekBar) findViewById(R.id.settings_seekbar_desiredDistance);
     SeekBar DesiredDifficulty = (SeekBar) findViewById(R.id.settings_seekbar_desiredDifficulty);
-    Log.d(TAG, "onCreate: " + mAuth.getCurrentUser().getDisplayName());
+    
     mDatabase.child("users").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
   
       @Override
@@ -58,14 +61,37 @@ public class SettingsActivity extends AppCompatActivity {
           Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
         }
         else {
-          Log.d(TAG, "onComplete: " + task.getResult().getValue());
-          
+          DataSnapshot result = task.getResult();
+          Iterator iterator = result.getChildren().iterator();
+          for(int i = 0; i < result.getChildrenCount(); i++) {
+            DataSnapshot next = (DataSnapshot) iterator.next();
+            HashMap user = (HashMap) next.getValue();
+            if(user.get("name").equals(mAuth.getCurrentUser().getDisplayName())) {
+              // current user found
+              currentUser = new User();
+              currentUser.setUid(user.get("uid"));
+              currentUser.setName(user.get("name"));
+              if(user.containsKey("desiredDistance")) {
+                currentUser.setDesiredDistance(user.get("desiredDistance"));
+              }
+              else {
+                currentUser.setDesiredDistance(50);
+              }
+              if(user.containsKey("desiredDifficulty")) {
+                currentUser.setDesiredDifficulty(user.get("desiredDifficulty"));
+              }
+              else {
+                currentUser.setDesiredDifficulty(50);
+              }
+              currentUser.setScore(user.get("score"));
+            }
+          }
         }
       }
     });
     // TODO set initial progress of seekbars by reading database
-    // DesiredDistance.setProgress()
-    // DesiredDifficulty.setProgress()
+    // DesiredDistance.setProgress(currentUser.)
+    // DesiredDifficulty.setProgress(currentUser.)
     
   
     RankingsButton.setOnClickListener(new View.OnClickListener() {
@@ -98,41 +124,6 @@ public class SettingsActivity extends AppCompatActivity {
       public void onClick(View view) {
         // attempt to set new username
         setUsername(String.valueOf(NewUsername.getText()));
-      }
-    });
-    DesiredDistance.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-      @Override
-      public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-    
-      }
-  
-      @Override
-      public void onStartTrackingTouch(SeekBar seekBar) {
-    
-      }
-  
-      @Override
-      public void onStopTrackingTouch(SeekBar seekBar) {
-    
-      }
-    });
-    DesiredDifficulty.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-  
-      @Override
-      public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-        Log.d(TAG, "onProgressChanged: " + i + " " + b);
-      }
-  
-      @Override
-      public void onStartTrackingTouch(SeekBar seekBar) {
-        Log.d(TAG, "onStartTrackingTouch: ");
-      }
-  
-      @Override
-      public void onStopTrackingTouch(SeekBar seekBar) {
-        Log.d(TAG, "onStopTrackingTouch: ");
-        Log.d(TAG, "onStopTrackingTouch: " + seekBar.getProgress());
-        seekBar.setProgress(100);
       }
     });
   }
