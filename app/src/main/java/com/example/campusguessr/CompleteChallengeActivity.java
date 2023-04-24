@@ -4,10 +4,12 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
 import com.example.campusguessr.POJOs.Attempt;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -17,7 +19,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.campusguessr.databinding.CompleteChallengeBinding;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.Map;
+
 public class CompleteChallengeActivity extends FragmentActivity {
+
+  private String TAG = "CompleteChallengeActivity";
   
   private GoogleMap mMap;
   private CompleteChallengeBinding binding;
@@ -64,7 +70,9 @@ public class CompleteChallengeActivity extends FragmentActivity {
     String attemptId = getIntent().getStringExtra("attemptId");
     database.getReference().child("attempts").child(attemptId).get().addOnCompleteListener(task -> {
       if (task.isSuccessful()) {
-        attempt = task.getResult().getValue(Attempt.class);
+        Map m = (Map<String, Object>) task.getResult().getValue();
+        ObjectMapper mapper = new ObjectMapper();
+        attempt = mapper.convertValue(m, Attempt.class);
         getSupportFragmentManager().beginTransaction().add(R.id.map_fragment, new MapFragment(attempt.getGuesses())).commit();
       }
     });

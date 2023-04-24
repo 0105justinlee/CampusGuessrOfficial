@@ -78,9 +78,9 @@ public class SubmitChallengeActivity extends Activity {
             Date currentTime = Calendar.getInstance().getTime();
 
             // Create new Attempt object and upload
-            Attempt attempt = new Attempt(UUID.randomUUID().toString(), challengeId, uId, guesses, currentTime);
+            Attempt attempt = new Attempt(UUID.randomUUID().toString(), challengeId, uId, guesses, myScore, playtime, currentTime);
             Map attMap = new ObjectMapper().convertValue(attempt, Map.class);
-            mDatabase.child("attempt")
+            mDatabase.child("attempts")
                     .child(attempt.getId())
                     .setValue(attMap);
 

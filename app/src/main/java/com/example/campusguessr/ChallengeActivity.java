@@ -24,6 +24,8 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
@@ -135,7 +137,8 @@ public class ChallengeActivity extends AppCompatActivity {
                             guessLocations.add(location);
                             adapter.notifyItemInserted(guesses.size()-1);
 
-                            if (distance < 50) {
+//                            if (distance < 50) {
+                            if (distance < 50 || guesses.size() == 2) { // TODO: remove this line when testing is done
                                 Toast.makeText(ChallengeActivity.this, "You won!", Toast.LENGTH_SHORT).show();
                                 // covert guessLocations to com.example.campusguessr.POJOs.Location[]
                                 com.example.campusguessr.POJOs.Location[] guessesMade = new com.example.campusguessr.POJOs.Location[guessLocations.size()];
@@ -149,10 +152,8 @@ public class ChallengeActivity extends AppCompatActivity {
                                     }
                                     if (result != null) {
                                         Toast.makeText(ChallengeActivity.this, "Challenge submitted!", Toast.LENGTH_SHORT).show();
-                                        Bundle challengeInfo = new Bundle();
-                                        challengeInfo.putString("attemptId", result.getId());
                                         var intent = new Intent(getApplicationContext(), CompleteChallengeActivity.class);
-                                        intent.putExtra("challengeInfo", challengeInfo);
+                                        intent.putExtra("attemptId", result.getId());
                                         startActivity(intent);
                                     }
                                     return null;
@@ -192,16 +193,16 @@ public class ChallengeActivity extends AppCompatActivity {
                     // Create new Attempt object and upload
                     Attempt attempt = new Attempt(UUID.randomUUID().toString(), uId, challengeId, guesses, myScore, playtime, currentTime);
                     Map attMap = new ObjectMapper().convertValue(attempt, Map.class);
-                    mDatabase.child("attempt")
+                    Task t1 = mDatabase.child("attempts")
                             .child(attempt.getId())
                             .setValue(attMap);
 
-                    mDatabase.child("attempt-by-user")
+                    Task t2 = mDatabase.child("attempt-by-user")
                             .child(uId)
                             .push()
                             .setValue(attempt.getId());
 
-                    mDatabase.child("attempt-by-challenge")
+                    Task t3 = mDatabase.child("attempt-by-challenge")
                             .child(challengeId)
                             .push()
                             .setValue(attempt.getId());
@@ -209,24 +210,35 @@ public class ChallengeActivity extends AppCompatActivity {
                     DatabaseReference scoreRef = mDatabase.child("users")
                             .child(uId)
                             .child("score");
-                    scoreRef
-                            .get()
-                            .addOnCompleteListener(task2 -> {
-                                if (task2.isSuccessful()) {
-                                    DataSnapshot ds2 = task2.getResult();
-                                    if (ds2 != null && ds2.getValue() != null) {
-                                        int score = ds2.getValue(Integer.class);
+
+                    Task<DataSnapshot> t4 = scoreRef.get();
+
+                    // make sure all tasks are complete
+                    Tasks.whenAllComplete(t1, t2, t3, t4).addOnCompleteListener(task1 -> {
+                        if (task1.isSuccessful()) {
+                            if (task1.getResult().get(0).isSuccessful() && task1.getResult().get(1).isSuccessful() && task1.getResult().get(2).isSuccessful()) {
+                                // update score
+                                if (task1.getResult().get(3).isSuccessful()) {
+                                    DataSnapshot ds1 = (DataSnapshot) task1.getResult().get(3).getResult();
+                                    if (ds1.exists()) {
+                                        Integer score = ds1.getValue(Integer.class);
                                         scoreRef.setValue(score + myScore);
                                     } else {
                                         scoreRef.setValue(myScore);
                                     }
-                                    Toast.makeText(this, "Submitted Challenge", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(this, "Submitted Attempt", Toast.LENGTH_SHORT).show();
                                     f.complete(attempt);
-                                } else {
-                                    Log.d(TAG, "submitChallenge: failed to get score");
-                                    throw new CompletionException(task.getException());
                                 }
-                            });
+                            } else {
+                                Log.d(TAG, "submitChallenge: failed to upload attempt");
+                                throw new CompletionException(new Exception("failed to upload attempt"));
+                            }
+                        } else {
+                            Log.d(TAG, "submitChallenge: failed to upload attempt");
+                            throw new CompletionException(task1.getException());
+                        }
+                    });
+
                 } else {
                     Toast.makeText(this, "challenge does not exist", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "submitChallenge: challenge does not exist");

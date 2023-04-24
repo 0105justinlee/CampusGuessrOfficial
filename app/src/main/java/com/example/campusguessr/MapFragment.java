@@ -1,5 +1,8 @@
 package com.example.campusguessr;
 
+import android.os.Bundle;
+
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.campusguessr.POJOs.Location;
@@ -21,6 +24,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public MapFragment(Location[] locs) {
         super(R.layout.map_fragment);
         locations = Arrays.asList(locs);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
