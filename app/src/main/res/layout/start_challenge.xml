@@ -9,10 +9,10 @@
 
     <ImageView
         android:id="@+id/start_challenge_image"
+        android:rotation="90"
         android:layout_width="300dp"
         android:layout_height="300dp"
-        android:layout_marginTop="30dp"
-        app:srcCompat="@drawable/ic_launcher_background" />
+        android:layout_marginTop="30dp" />
 
     <TextView
         android:id="@+id/start_challenge_distance"
@@ -48,10 +48,13 @@
         android:layout_marginRight="30dp"
         android:text="@string/reroll_button_text" />
 
+    <!-- Push navigation bar to bottom !-->
+    <View android:layout_weight="1" android:layout_height="0dp" android:layout_width="0dp"/>
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_marginTop="30dp">
+        android:layout_height="90dp"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"

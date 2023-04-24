@@ -58,8 +58,6 @@ public class CreateChallengeActivity extends AppCompatActivity {
 
         titleText = findViewById(R.id.titleText);
         descriptionText = findViewById(R.id.descriptionText);
-        locOriText = findViewById(R.id.locOriText);
-        photoPathText = findViewById(R.id.photoPathText);
         photoView = findViewById(R.id.photoView);
 
         mAuth = FirebaseAuth.getInstance();
@@ -128,8 +126,6 @@ public class CreateChallengeActivity extends AppCompatActivity {
             orientation = extras.getFloatArray("orientation");
             photoPath = extras.getString("photoPath");
 
-            locOriText.setText("Location: " + location[0] + ", " + location[1] + ", Orientation: " + orientation[0] + ", " + orientation[1] + ", " + orientation[2]);
-            photoPathText.setText("Photo Path: " + photoPath);
             photoView.setImageURI(Uri.parse(photoPath));
         }
 
