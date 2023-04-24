@@ -2,6 +2,7 @@ package com.example.campusguessr;
 
 import static android.content.ContentValues.TAG;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -13,13 +14,30 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
+import android.widget.Toast;
+
+import com.example.campusguessr.POJOs.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class SettingsActivity extends AppCompatActivity {
+  
+  private FirebaseAuth mAuth;
+  private DatabaseReference mDatabase;
+  private User currentUser;
   
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.settings);
+    mAuth = FirebaseAuth.getInstance();
+    mDatabase = FirebaseDatabase.getInstance().getReference();
+    
     ImageButton RankingsButton = (ImageButton) findViewById(R.id.navigate_ranking_tab_button);
     ImageButton CreateButton = (ImageButton) findViewById(R.id.navigate_create_tab_button);
     ImageButton PlayButton = (ImageButton) findViewById(R.id.navigate_play_tab_button);
@@ -30,6 +48,21 @@ public class SettingsActivity extends AppCompatActivity {
     
     SeekBar DesiredDistance = (SeekBar) findViewById(R.id.settings_seekbar_desiredDistance);
     SeekBar DesiredDifficulty = (SeekBar) findViewById(R.id.settings_seekbar_desiredDifficulty);
+    Log.d(TAG, "onCreate: " + mAuth.getCurrentUser().getDisplayName());
+    mDatabase.child("users").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+  
+      @Override
+      public void onComplete(@NonNull Task<DataSnapshot> task) {
+        if (!task.isSuccessful()) {
+          String str = "Error getting data: " + task.getException().getMessage();
+          Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
+        }
+        else {
+          Log.d(TAG, "onComplete: " + task.getResult().getValue());
+          
+        }
+      }
+    });
     // TODO set initial progress of seekbars by reading database
     // DesiredDistance.setProgress()
     // DesiredDifficulty.setProgress()
@@ -110,5 +143,11 @@ public class SettingsActivity extends AppCompatActivity {
     // ensure this username does not exist elsewhere in the database
     
     // set username
+  }
+  
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    // TODO push new values to database
   }
 }
