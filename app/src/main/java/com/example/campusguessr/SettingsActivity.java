@@ -69,29 +69,35 @@ public class SettingsActivity extends AppCompatActivity {
             if(user.get("name").equals(mAuth.getCurrentUser().getDisplayName())) {
               // current user found
               currentUser = new User();
-              currentUser.setUid(user.get("uid"));
-              currentUser.setName(user.get("name"));
+              Log.d(TAG, "onComplete: " + user.get("uid"));
+              
+              currentUser.setUid(user.get("uid").toString());
+              currentUser.setName(user.get("name").toString());
               if(user.containsKey("desiredDistance")) {
-                currentUser.setDesiredDistance(user.get("desiredDistance"));
+                currentUser.setDesiredDistance((int) user.get("desiredDistance"));
               }
               else {
                 currentUser.setDesiredDistance(50);
               }
               if(user.containsKey("desiredDifficulty")) {
-                currentUser.setDesiredDifficulty(user.get("desiredDifficulty"));
+                currentUser.setDesiredDifficulty((int) user.get("desiredDifficulty"));
               }
               else {
                 currentUser.setDesiredDifficulty(50);
               }
-              currentUser.setScore(user.get("score"));
+              Long score = (Long) user.get("score");
+              currentUser.setScore(score.intValue());
+              Log.d(TAG, "onComplete: " + currentUser);
             }
           }
         }
       }
     });
+    // TODO fill username change input with current username
+    //NewUsername.setText(currentUser.getName());
     // TODO set initial progress of seekbars by reading database
-    // DesiredDistance.setProgress(currentUser.)
-    // DesiredDifficulty.setProgress(currentUser.)
+    //DesiredDistance.setProgress(currentUser.getDesiredDistance());
+    //DesiredDifficulty.setProgress(currentUser.getDesiredDifficulty());
     
   
     RankingsButton.setOnClickListener(new View.OnClickListener() {
@@ -129,11 +135,18 @@ public class SettingsActivity extends AppCompatActivity {
   }
   
   private void setUsername(String username) {
-    // ensure text does not contain invalid characters
-    
+    // TODO find max length
+    if(username.length() > 50) {
+      // TODO throw an error message to the user
+      return;
+    }
     // ensure this username does not exist elsewhere in the database
     
+    
     // set username
+    currentUser.setName(username);
+    
+    // TODO send successfully updated message to user
   }
   
   @Override
