@@ -119,14 +119,16 @@ public class CreateChallengeActivity extends AppCompatActivity {
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        super.onActivityResult(requestCode, resultCode, intent);
+//        super.onActivityResult(requestCode, resultCode, intent);
         Bundle extras = intent.getExtras();
-        if (resultCode == RESULT_OK) {
-            location = extras.getDoubleArray("location");
-            orientation = extras.getFloatArray("orientation");
-            photoPath = extras.getString("photoPath");
+        if (requestCode == 0){
+            if (resultCode == RESULT_OK) {
+                location = extras.getDoubleArray("location");
+                orientation = extras.getFloatArray("orientation");
+                photoPath = extras.getString("photoPath");
 
-            photoView.setImageURI(Uri.parse(photoPath));
+                photoView.setImageURI(Uri.parse(photoPath));
+            }
         }
 
          // Called after user presses the button from DuplicateDetectActivity
@@ -239,7 +241,7 @@ public class CreateChallengeActivity extends AppCompatActivity {
                             Double.parseDouble(childSnapshot.child("location").child("longitude").getValue().toString());
                     // Calculate the distance between the current coordinates and the coordinates in the database
                     double distance = distance(location[0], location[1], curLatitude, curLongitude);
-                    double LOCATION_THRESHOLD = 0.2;  // 200 meters -> Can modify
+                    double LOCATION_THRESHOLD = 0.01;  // 10 meters -> Can modify
 
                     // Orientation variables
                     float curX = Float.parseFloat(childSnapshot.child("orientation").child("x").getValue().toString());
@@ -257,6 +259,14 @@ public class CreateChallengeActivity extends AppCompatActivity {
                         intent.putExtra("photoPath", photoPath);
                         startActivityForResult(intent, 1);
                     }
+
+//                    if (Math.abs(location[0] - curLatitude) < 5 && Math.abs(location[1] - curLongitude) < 5 && Math.abs(curX - orientation[0]) < 5 && Math.abs(curY - orientation[1]) < 5 && Math.abs(curZ - orientation[2]) < 5) {
+//                        // Move to duplicate detect activity
+//                        Intent intent = new Intent(getApplicationContext(), DuplicateDetectActivity.class);
+//                        intent.putExtra("Duplicate Picture", childKey);
+//                        intent.putExtra("photoPath", photoPath);
+//                        startActivityForResult(intent, 1);
+//                    }
                 }
             }
 
