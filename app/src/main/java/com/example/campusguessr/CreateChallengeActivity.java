@@ -146,6 +146,7 @@ public class CreateChallengeActivity extends AppCompatActivity {
     }
 
     public void submit(View view) {
+        // Check for duplicates before submitting the challenge
         checkDuplicate();
 
         Challenge c1 = new Challenge();
