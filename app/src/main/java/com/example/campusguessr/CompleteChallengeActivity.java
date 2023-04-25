@@ -34,8 +34,7 @@ public class CompleteChallengeActivity extends FragmentActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    binding = CompleteChallengeBinding.inflate(getLayoutInflater());
-    setContentView(binding.getRoot());
+    setContentView(R.layout.complete_challenge);
 
     ImageButton RankingButton = (ImageButton) findViewById(R.id.navigate_ranking_tab_button);
     ImageButton PlayButton = (ImageButton) findViewById(R.id.navigate_play_tab_button);
@@ -47,7 +46,7 @@ public class CompleteChallengeActivity extends FragmentActivity {
         startActivity(new Intent(getApplicationContext(), RankingsActivity.class));
       }
     });
-    
+
     PlayButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {

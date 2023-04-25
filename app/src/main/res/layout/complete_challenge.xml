@@ -8,10 +8,10 @@
     android:orientation="vertical"
     android:gravity="center_horizontal">
 
-    <androidx.constraintlayout.widget.Placeholder
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/map_fragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="541dp"/>
 
 
     <TextView
