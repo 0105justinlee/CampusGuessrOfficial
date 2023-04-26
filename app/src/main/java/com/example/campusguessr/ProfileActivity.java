@@ -16,6 +16,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -54,12 +56,12 @@ public class ProfileActivity extends AppCompatActivity {
         ImageButton PlayButton = (ImageButton) findViewById(R.id.navigate_play_tab_button);
         ImageButton SettingsButton = (ImageButton) findViewById(R.id.profile_settings_button);
 
-        TextView username = findViewById(R.id.profile_username);
+        
         mAuth = FirebaseAuth.getInstance();
-
-        String usernameString = mAuth.getCurrentUser().getDisplayName();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        
         String userId = mAuth.getCurrentUser().getUid();
-        username.setText(usernameString);
+        
 
         // TODO: might need to make another recyclerview for my challenges later
         RecyclerView myChallengesRecycler = findViewById(R.id.recyclerview_my_challenges);
@@ -70,7 +72,7 @@ public class ProfileActivity extends AppCompatActivity {
         myChallengesRecycler.setAdapter(myChallengeAdapter);
         myChallengesRecycler.setNestedScrollingEnabled(false);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        
 
         // database query to retrieve user's submitted challenges
         Query myChallengesQuery = mDatabase.child("challenges").orderByChild("createdBy").equalTo(userId);
@@ -125,6 +127,32 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+            }
+        });
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mDatabase.child("users").child(mAuth.getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (!task.isSuccessful()) {
+                    String str = "Error getting data: " + task.getException().getMessage();
+                    Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    HashMap user = (HashMap) task.getResult().getValue();
+                    // update username
+                    TextView username = findViewById(R.id.profile_username);
+                    username.setText(user.get("name").toString());
+                    
+                    // update total points
+                    TextView totalScore = findViewById(R.id.profile_total_points);
+                    totalScore.setText(user.get("score").toString() + " points total");
+                    
+                    // TODO get points in a week and points today
+                }
             }
         });
     }
