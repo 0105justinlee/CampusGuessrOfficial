@@ -19,14 +19,15 @@
 
     <EditText
         android:id="@+id/settings_edittext_username"
-        android:layout_width="285dp"
+        android:layout_width="258dp"
         android:layout_height="48dp"
         android:layout_marginStart="24dp"
         android:layout_marginTop="20dp"
         android:background="@drawable/edittext_background"
-        android:hint="Enter username"
+        android:hint="@string/enter_username_direction"
+        android:inputType="text"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settings_username"></EditText>
+        app:layout_constraintTop_toBottomOf="@+id/settings_username" />
 
     <Button
         android:id="@+id/settings_username_button"
@@ -34,7 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="20dp"
-        android:text="Submit"
+        android:text="@string/submit_button_text"
         app:layout_constraintStart_toEndOf="@+id/settings_edittext_username"
         app:layout_constraintTop_toBottomOf="@+id/settings_username" />
 
@@ -44,7 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="48dp"
-        android:text="Desired Distance: "
+        android:text="@string/desired_distance_input"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -52,8 +53,8 @@
 
     <SeekBar
         android:id="@+id/settings_seekbar_desiredDistance"
-        android:layout_width="362dp"
-        android:layout_height="29dp"
+        android:layout_width="351dp"
+        android:layout_height="32dp"
         android:layout_marginStart="24dp"
         android:layout_marginTop="20dp"
         android:max="100"
@@ -67,7 +68,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="8dp"
-        android:text="Very Close"
+        android:text="@string/desired_distance_min"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/settings_seekbar_desiredDistance" />
 
@@ -75,9 +76,9 @@
         android:id="@+id/settings_desiredDistance_far"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="244dp"
+        android:layout_marginStart="232dp"
         android:layout_marginTop="8dp"
-        android:text="Very Far"
+        android:text="@string/desired_distance_max"
         app:layout_constraintStart_toEndOf="@+id/settings_desiredDistance_close"
         app:layout_constraintTop_toBottomOf="@+id/settings_seekbar_desiredDistance" />
 
@@ -87,7 +88,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="48dp"
-        android:text="Desired Difficulty:"
+        android:text="@string/desired_difficulty_input"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -95,8 +96,8 @@
 
     <SeekBar
         android:id="@+id/settings_seekbar_desiredDifficulty"
-        android:layout_width="362dp"
-        android:layout_height="29dp"
+        android:layout_width="349dp"
+        android:layout_height="27dp"
         android:layout_marginStart="24dp"
         android:layout_marginTop="20dp"
         android:max="100"
@@ -110,8 +111,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="4dp"
-        android:text="Very Easy"
+        android:layout_marginTop="8dp"
+        android:text="@string/desired_difficulty_min"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/settings_seekbar_desiredDifficulty" />
 
@@ -119,22 +120,10 @@
         android:id="@+id/settings_desiredDifficulty_hard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="244dp"
-        android:layout_marginTop="4dp"
-        android:text="Very Hard"
+        android:layout_marginStart="232dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/desired_difficulty_max"
         app:layout_constraintStart_toEndOf="@+id/settings_desiredDifficulty_easy"
-        app:layout_constraintTop_toBottomOf="@+id/settings_seekbar_desiredDifficulty" />
-
-    <TextView
-        android:id="@+id/settings_colorblindOptions"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="48dp"
-        android:text="Colorblind Options:"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/settings_seekbar_desiredDifficulty" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
