@@ -244,7 +244,7 @@ public class CreateChallengeActivity extends AppCompatActivity {
                     float curX = Float.parseFloat(childSnapshot.child("orientation").child("x").getValue().toString());
                     float curY = Float.parseFloat(childSnapshot.child("orientation").child("y").getValue().toString());
                     float curZ = Float.parseFloat(childSnapshot.child("orientation").child("z").getValue().toString());
-                    float ANGLE_THRESHOLD = 30.0f; // 30 degrees -> Can modify
+                    float ANGLE_THRESHOLD = 60.0f; // 60 degrees -> Can modify
                     // Calculate the difference in orientation between the current and database values
                     double angleDiff = angleDiff(orientation, curX, curY, curZ);
 
