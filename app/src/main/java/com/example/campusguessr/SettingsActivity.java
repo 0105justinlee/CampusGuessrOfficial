@@ -73,13 +73,15 @@ public class SettingsActivity extends AppCompatActivity {
           currentUser.setUid(user.get("uid").toString());
           currentUser.setName(user.get("name").toString());
           if(user.containsKey("desiredDistance")) {
-            currentUser.setDesiredDistance((int) user.get("desiredDistance"));
+            Long distance = (Long) user.get("desiredDistance");
+            currentUser.setDesiredDistance(distance.intValue());
           }
           else {
             currentUser.setDesiredDistance(50);
           }
           if(user.containsKey("desiredDifficulty")) {
-            currentUser.setDesiredDifficulty((int) user.get("desiredDifficulty"));
+            Long difficulty = (Long) user.get("desiredDifficulty");
+            currentUser.setDesiredDifficulty(difficulty.intValue());
           }
           else {
             currentUser.setDesiredDifficulty(50);
@@ -142,6 +144,7 @@ public class SettingsActivity extends AppCompatActivity {
       @Override
       public void onStopTrackingTouch(SeekBar seekBar) {
         desiredDifficultyUpdated = true;
+        currentUser.setDesiredDifficulty(seekBar.getProgress());
       }
     });
     
@@ -159,6 +162,7 @@ public class SettingsActivity extends AppCompatActivity {
       @Override
       public void onStopTrackingTouch(SeekBar seekBar) {
         desiredDistanceUpdated = true;
+        currentUser.setDesiredDistance(seekBar.getProgress());
       }
     });
   }
@@ -197,21 +201,13 @@ public class SettingsActivity extends AppCompatActivity {
   }
   
   @Override
-  protected void onDestroy() {
-    super.onDestroy();
+  protected void onStop() {
+    super.onStop();
     // push new username
-    if(usernameUpdated) {
-    
-    }
-    
-    // push new desired distance
-    if(desiredDistanceUpdated) {
-    
-    }
-    
-    // push new desired difficulty
-    if(desiredDifficultyUpdated) {
-    
+    if (usernameUpdated || desiredDistanceUpdated || desiredDifficultyUpdated) {
+      HashMap map = new HashMap();
+      map.put(mAuth.getCurrentUser().getUid(), currentUser);
+      mDatabase.child("users").updateChildren(map);
     }
   }
 }
