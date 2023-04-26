@@ -1,6 +1,8 @@
 package com.example.campusguessr;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -81,6 +83,7 @@ public class MyChallengeAdapter extends RecyclerView.Adapter<MyChallengeAdapter.
         myChallenges = dataSet;
     }
 
+    private MyChallengeAdapter thisAdapter = this;
     // Create new views (invoked by the layout manager)
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
@@ -101,13 +104,16 @@ public class MyChallengeAdapter extends RecyclerView.Adapter<MyChallengeAdapter.
         Object key = null;
 
         List keys = new ArrayList(myChallenges.keySet());
-        for (int i = 0; i < keys.size(); i++) {
+        int i;
+        for (i = 0; i < keys.size(); i++) {
             if (i == position) {
                 key = keys.get(i);
+                break;
             }
         }
 
         final Object deleteKey = key;
+        final int deletePosition = i;
 
         ArrayList<String> valueArray = myChallenges.get(key);
         Picasso.get().load(valueArray.get(2)).rotate(90f).resize(800,1000).centerCrop().into(viewHolder.getImageButton());
@@ -166,11 +172,14 @@ public class MyChallengeAdapter extends RecyclerView.Adapter<MyChallengeAdapter.
 
                         mAuth = FirebaseAuth.getInstance();
                         mDatabase = FirebaseDatabase.getInstance().getReference();
-                        Query deleteQuery = mDatabase.child("challenges").equalTo(deleteKey.toString());
+                        Query deleteQuery = mDatabase.child("challenges").child(deleteKey.toString());
                         deleteQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 snapshot.getRef().removeValue();
+                                popupWindow.dismiss();
+                                context.startActivity(new Intent(context.getApplicationContext(), ProfileActivity.class));
+                                ((Activity)context).finish();
                             }
 
                             @Override

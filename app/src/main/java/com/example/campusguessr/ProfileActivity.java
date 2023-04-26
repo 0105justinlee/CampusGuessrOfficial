@@ -63,6 +63,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         // TODO: might need to make another recyclerview for my challenges later
         RecyclerView myChallengesRecycler = findViewById(R.id.recyclerview_my_challenges);
+        myChallengesRecycler.setItemAnimator(null);
         myChallengesRecycler.setLayoutManager(new LinearLayoutManager(this));
 
         myChallengeAdapter = new MyChallengeAdapter(myChallenges);
