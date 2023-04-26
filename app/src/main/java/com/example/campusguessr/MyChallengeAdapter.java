@@ -7,14 +7,24 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -97,6 +107,8 @@ public class MyChallengeAdapter extends RecyclerView.Adapter<MyChallengeAdapter.
             }
         }
 
+        final Object deleteKey = key;
+
         ArrayList<String> valueArray = myChallenges.get(key);
         Picasso.get().load(valueArray.get(2)).rotate(90f).resize(800,1000).centerCrop().into(viewHolder.getImageButton());
         //viewHolder.getTextView().setText(valueArray.get(2));
@@ -131,12 +143,41 @@ public class MyChallengeAdapter extends RecyclerView.Adapter<MyChallengeAdapter.
                 ((TextView)popupView.findViewById(R.id.popup_delete_description)).setText(valueArray.get(1));
                 Picasso.get().load(valueArray.get(2)).rotate(90f).resize(800,800).centerCrop().into((ImageButton) popupView.findViewById(R.id.popup_delete_image));
 
-                // dismiss the popup window when touched
-                popupView.setOnTouchListener(new View.OnTouchListener() {
+                // dismiss popup window when touching cancel button
+                // popup window still dismisses when touching outside of it too
+                Button cancel = popupView.findViewById(R.id.popup_cancel_button);
+                cancel.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public boolean onTouch(View v, MotionEvent event) {
+                    public void onClick(View view) {
                         popupWindow.dismiss();
-                        return true;
+                    }
+                });
+
+                // delete challenge when pressing delete button
+                Button delete = popupView.findViewById(R.id.popup_delete_button);
+                delete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // First find the appropriate key
+                        //System.out.println("Delete Key: " + deleteKey.toString());
+                        FirebaseAuth mAuth;
+                        FirebaseStorage storage;
+                        DatabaseReference mDatabase;
+
+                        mAuth = FirebaseAuth.getInstance();
+                        mDatabase = FirebaseDatabase.getInstance().getReference();
+                        Query deleteQuery = mDatabase.child("challenges").equalTo(deleteKey.toString());
+                        deleteQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                snapshot.getRef().removeValue();
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
                     }
                 });
             }
