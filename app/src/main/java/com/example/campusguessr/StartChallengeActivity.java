@@ -203,7 +203,18 @@ public class StartChallengeActivity extends AppCompatActivity {
                                         if (attemptsCount == attemptsChecked) {
                                             float avgGuesses = guessesCount/attemptsCount;
                                             TextView difficultyView = findViewById(R.id.start_challenge_difficulty);
-                                            difficultyView.setText(String.format("Difficulty: %.2f", avgGuesses));
+                                            if (attemptsCount == 0) {
+                                                difficultyView.setText(String.format("Difficulty: medium"));
+                                            }
+                                            else if (avgGuesses < 2.5) {
+                                                difficultyView.setText(String.format("Difficulty: easy"));
+                                            }
+                                            else if (avgGuesses < 4.5) {
+                                                difficultyView.setText(String.format("Difficulty: medium"));
+                                            }
+                                            else {
+                                                difficultyView.setText(String.format("Difficulty: hard"));
+                                            }
                                         }
                                     }
                                 });
