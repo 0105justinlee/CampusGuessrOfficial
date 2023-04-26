@@ -119,7 +119,7 @@ public class CreateChallengeActivity extends AppCompatActivity {
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-//        super.onActivityResult(requestCode, resultCode, intent);
+        super.onActivityResult(requestCode, resultCode, intent);
         Bundle extras = intent.getExtras();
         if (requestCode == 0){
             if (resultCode == RESULT_OK) {
@@ -217,13 +217,10 @@ public class CreateChallengeActivity extends AppCompatActivity {
      */
     private void checkDuplicate() {
         // Get a reference to the Firebase Realtime Database
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-
         String usernameString = mAuth.getCurrentUser().getDisplayName();
         String userId = mAuth.getCurrentUser().getUid();
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference dbRef = database.getReference().child("challenges");
+        DatabaseReference dbRef = mDatabase.child("challenges");
 
         // Retrieve data from the database
         dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
