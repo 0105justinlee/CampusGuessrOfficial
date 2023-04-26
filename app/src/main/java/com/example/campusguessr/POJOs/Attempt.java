@@ -14,7 +14,7 @@ public class Attempt {
     private String challengeId;
     private String userId;
     private Location[] guesses;
-    private Integer score;
+    private Long score;
     private Integer playTime;
     private Date createdAt;
 }
