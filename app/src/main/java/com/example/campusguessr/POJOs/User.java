@@ -14,5 +14,5 @@ public class User {
     private String name;
     private int desiredDistance;
     private int desiredDifficulty;
-    private int score = 0;
+    private long score = 0;
 }

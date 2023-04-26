@@ -86,8 +86,7 @@ public class SettingsActivity extends AppCompatActivity {
           else {
             currentUser.setDesiredDifficulty(50);
           }
-          Long score = (Long) user.get("score");
-          currentUser.setScore(score.intValue());
+          currentUser.setScore(user.get("score"));
           Log.d(TAG, "onComplete: " + currentUser);
           NewUsername.setText(currentUser.getName());
           DesiredDistance.setProgress(currentUser.getDesiredDistance());

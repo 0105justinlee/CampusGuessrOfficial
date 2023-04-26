@@ -11,12 +11,12 @@ public class Location {
     private double latitude;
     private double longitude;
 
-    public Integer distanceTo(Location other) {
+    public Double distanceTo(Location other) {
         // return distance in meters
         double lat1 = this.latitude;
         double lon1 = this.longitude;
-        double lat2 = other.latitude;
-        double lon2 = other.longitude;
-        return (int) (Math.sqrt(Math.pow(lat1 - lat2, 2) + Math.pow(lon1 - lon2, 2)) * 100000);
+        double lat2 = other.getLatitude();
+        double lon2 = other.getLongitude();
+        return (Math.sqrt(Math.pow(lat1 - lat2, 2) + Math.pow(lon1 - lon2, 2)) * 100000);
     }
 }

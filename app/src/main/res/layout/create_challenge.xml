@@ -79,25 +79,6 @@
         app:layout_constraintTop_toBottomOf="@+id/textView3"
         app:srcCompat="@drawable/baseline_photo_camera_24" />
 
-    <TextView
-        android:id="@+id/photoPathText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="100dp"
-        android:layout_marginTop="20dp"
-        android:text="TextView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/locOriText" />
-
-    <TextView
-        android:id="@+id/locOriText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="100dp"
-        android:text="TextView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/photoView" />
-
     <Button
         android:id="@+id/submitButton"
         android:layout_width="wrap_content"
@@ -112,10 +93,10 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:layout_width="match_parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/capturePhoto"
         android:layout_height="90dp"
-        android:layout_marginTop="136dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         >
 
         <LinearLayout
