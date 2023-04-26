@@ -238,13 +238,13 @@ public class CreateChallengeActivity extends AppCompatActivity {
                             Double.parseDouble(childSnapshot.child("location").child("longitude").getValue().toString());
                     // Calculate the distance between the current coordinates and the coordinates in the database
                     double distance = distance(location[0], location[1], curLatitude, curLongitude);
-                    double LOCATION_THRESHOLD = 0.01;  // 10 meters -> Can modify
+                    double LOCATION_THRESHOLD = 0.2;  // 200 meters -> Can modify
 
                     // Orientation variables
                     float curX = Float.parseFloat(childSnapshot.child("orientation").child("x").getValue().toString());
                     float curY = Float.parseFloat(childSnapshot.child("orientation").child("y").getValue().toString());
                     float curZ = Float.parseFloat(childSnapshot.child("orientation").child("z").getValue().toString());
-                    float ANGLE_THRESHOLD = 10.0f; // 10 degrees -> Can modify
+                    float ANGLE_THRESHOLD = 30.0f; // 30 degrees -> Can modify
                     // Calculate the difference in orientation between the current and database values
                     double angleDiff = angleDiff(orientation, curX, curY, curZ);
 
