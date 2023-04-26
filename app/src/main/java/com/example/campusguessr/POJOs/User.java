@@ -12,5 +12,7 @@ import lombok.RequiredArgsConstructor;
 public class User {
     private String uid;
     private String name;
+    private int desiredDistance;
+    private int desiredDifficulty;
     private int score = 0;
 }
