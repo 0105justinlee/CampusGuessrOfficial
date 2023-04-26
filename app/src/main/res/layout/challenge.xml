@@ -9,10 +9,11 @@
 
     <ImageView
         android:id="@+id/start_challenge_image"
+        android:rotation="90"
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:layout_marginTop="30dp"
-        app:srcCompat="@drawable/ic_launcher_background" />
+        android:contentDescription="Challenge picture"/>
 
 
     <androidx.recyclerview.widget.RecyclerView
@@ -21,8 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:textAlignment="center"
-        android:textColor="@color/design_default_color_error"
-        android:text="X distance away" />
+        android:textColor="@color/design_default_color_error"/>
 
     <Button
         android:id="@+id/guess_button"
@@ -33,10 +33,13 @@
         android:layout_marginRight="30dp"
         android:text="@string/guess_button_text" />
 
+    <!-- Push navigation bar to bottom !-->
+    <View android:layout_weight="1" android:layout_height="0dp" android:layout_width="0dp"/>
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:layout_width="match_parent"
         android:layout_height="90dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="150dp"
         >
 
         <LinearLayout

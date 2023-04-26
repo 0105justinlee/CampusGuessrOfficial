@@ -41,9 +41,7 @@ public class MainActivity extends AppCompatActivity {
         //start camera when permissions have been granted otherwise exit app
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (allPermissionsGranted()) {
-//                startActivity(new Intent(this, StartChallengeActivity.class));
-            } else {
+            if (!allPermissionsGranted()) {
                 Toast.makeText(this, "Permissions not granted by the user.", Toast.LENGTH_SHORT).show();
                 finish();
             }
@@ -69,11 +67,6 @@ public class MainActivity extends AppCompatActivity {
     }
     public void goToCreateChallenge(View view) {
         Intent intent = new Intent(this, CreateChallengeActivity.class);
-        startActivity(intent);
-    }
-
-    public void goToSubmitChallenge(View view) {
-        Intent intent = new Intent(this, SubmitChallengeActivity.class);
         startActivity(intent);
     }
 

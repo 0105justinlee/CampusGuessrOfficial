@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultCallback;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.campusguessr.POJOs.Challenge;
 import com.example.campusguessr.POJOs.Location;
@@ -30,7 +31,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
-public class CreateChallengeActivity extends Activity {
+public class CreateChallengeActivity extends AppCompatActivity {
     private final String TAG = "Create Challenge";
 
     private double[] location = new double[2];
@@ -54,8 +55,6 @@ public class CreateChallengeActivity extends Activity {
 
         titleText = findViewById(R.id.titleText);
         descriptionText = findViewById(R.id.descriptionText);
-        locOriText = findViewById(R.id.locOriText);
-        photoPathText = findViewById(R.id.photoPathText);
         photoView = findViewById(R.id.photoView);
 
         mAuth = FirebaseAuth.getInstance();
@@ -107,8 +106,6 @@ public class CreateChallengeActivity extends Activity {
             orientation = extras.getFloatArray("orientation");
             photoPath = extras.getString("photoPath");
 
-            locOriText.setText("Location: " + location[0] + ", " + location[1] + ", Orientation: " + orientation[0] + ", " + orientation[1] + ", " + orientation[2]);
-            photoPathText.setText("Photo Path: " + photoPath);
             photoView.setImageURI(Uri.parse(photoPath));
         }
     }
