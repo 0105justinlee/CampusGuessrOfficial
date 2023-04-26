@@ -33,6 +33,9 @@ public class SettingsActivity extends AppCompatActivity {
   private FirebaseAuth mAuth;
   private DatabaseReference mDatabase;
   private User currentUser;
+  private boolean usernameUpdated;
+  private boolean desiredDistanceUpdated;
+  private boolean desiredDifficultyUpdated;
   
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,10 @@ public class SettingsActivity extends AppCompatActivity {
     
     SeekBar DesiredDistance = (SeekBar) findViewById(R.id.settings_seekbar_desiredDistance);
     SeekBar DesiredDifficulty = (SeekBar) findViewById(R.id.settings_seekbar_desiredDifficulty);
+  
+    usernameUpdated = false;
+    desiredDistanceUpdated = false;
+    desiredDifficultyUpdated = false;
     
     mDatabase.child("users").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
   
@@ -88,16 +95,14 @@ public class SettingsActivity extends AppCompatActivity {
               Long score = (Long) user.get("score");
               currentUser.setScore(score.intValue());
               Log.d(TAG, "onComplete: " + currentUser);
+              NewUsername.setText(currentUser.getName());
+              DesiredDistance.setProgress(currentUser.getDesiredDistance());
+              DesiredDifficulty.setProgress(currentUser.getDesiredDifficulty());
             }
           }
         }
       }
     });
-    // TODO fill username change input with current username
-    //NewUsername.setText(currentUser.getName());
-    // TODO set initial progress of seekbars by reading database
-    //DesiredDistance.setProgress(currentUser.getDesiredDistance());
-    //DesiredDifficulty.setProgress(currentUser.getDesiredDifficulty());
     
   
     RankingsButton.setOnClickListener(new View.OnClickListener() {
@@ -132,26 +137,91 @@ public class SettingsActivity extends AppCompatActivity {
         setUsername(String.valueOf(NewUsername.getText()));
       }
     });
+    
+    DesiredDifficulty.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+      @Override
+      public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+    
+      }
+  
+      @Override
+      public void onStartTrackingTouch(SeekBar seekBar) {
+    
+      }
+  
+      @Override
+      public void onStopTrackingTouch(SeekBar seekBar) {
+        desiredDifficultyUpdated = true;
+      }
+    });
+    
+    DesiredDistance.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+      @Override
+      public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+    
+      }
+  
+      @Override
+      public void onStartTrackingTouch(SeekBar seekBar) {
+    
+      }
+  
+      @Override
+      public void onStopTrackingTouch(SeekBar seekBar) {
+        desiredDistanceUpdated = true;
+      }
+    });
   }
   
   private void setUsername(String username) {
-    // TODO find max length
     if(username.length() > 50) {
-      // TODO throw an error message to the user
+      Toast.makeText(getApplicationContext(), "Username must have length < 50 characters", Toast.LENGTH_SHORT).show();
       return;
     }
     // ensure this username does not exist elsewhere in the database
-    
-    
-    // set username
-    currentUser.setName(username);
-    
-    // TODO send successfully updated message to user
+    mDatabase.child("users").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+  
+      @Override
+      public void onComplete(@NonNull Task<DataSnapshot> task) {
+        if (!task.isSuccessful()) {
+          String str = "Error getting data: " + task.getException().getMessage();
+          Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
+        } else {
+          DataSnapshot result = task.getResult();
+          Iterator iterator = result.getChildren().iterator();
+          for (int i = 0; i < result.getChildrenCount(); i++) {
+            DataSnapshot next = (DataSnapshot) iterator.next();
+            HashMap user = (HashMap) next.getValue();
+            if (user.get("name").equals(username)) {
+              Toast.makeText(getApplicationContext(), "This username has been taken", Toast.LENGTH_SHORT).show();
+              return;
+            }
+          }
+          // set username
+          usernameUpdated = true;
+          currentUser.setName(username);
+          Toast.makeText(getApplicationContext(), "Successfully updated", Toast.LENGTH_SHORT).show();
+        }
+      }
+    });
   }
   
   @Override
   protected void onDestroy() {
     super.onDestroy();
-    // TODO push new values to database
+    // push new username
+    if(usernameUpdated) {
+    
+    }
+    
+    // push new desired distance
+    if(desiredDistanceUpdated) {
+    
+    }
+    
+    // push new desired difficulty
+    if(desiredDifficultyUpdated) {
+    
+    }
   }
 }
