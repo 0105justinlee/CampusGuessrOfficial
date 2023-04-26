@@ -12,5 +12,5 @@ import lombok.RequiredArgsConstructor;
 public class User {
     private String uid;
     private String name;
-    private int score = 0;
+    private long score = 0;
 }

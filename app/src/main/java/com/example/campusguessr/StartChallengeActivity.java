@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.campusguessr.POJOs.Attempt;
 import com.example.campusguessr.POJOs.Challenge;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -36,6 +37,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class StartChallengeActivity extends AppCompatActivity {
@@ -107,10 +109,22 @@ public class StartChallengeActivity extends AppCompatActivity {
                         }
                         else {
                             DataSnapshot dataSnapshot = task.getResult();
-                            DataSnapshot childSnap = dataSnapshot.getChildren().iterator().next();
+                            DataSnapshot childSnap;
+                            try {
+                                childSnap = dataSnapshot.getChildren().iterator().next();
+                            } catch (NoSuchElementException e) {
+                                getChallenge(); // Reroll if there is a problem with the challenge fetched
+                                return;
+                            }
                             challengeObj = new JSONObject((Map) childSnap.getValue());
-                            currentChallenge = new ObjectMapper().convertValue(childSnap.getValue(), Challenge.class);
+                            Challenge newChallenge = new ObjectMapper().convertValue(childSnap.getValue(), Challenge.class);
+                            if (currentChallenge != null && newChallenge.getId().equals(currentChallenge.getId())) {
+                                getChallenge(); // If rerolling, avoid duplicating challenge
+                                return;
+                            }
+                            currentChallenge = newChallenge;
                             getLocation();
+                            getDifficulty();
                             new RetrieveImageTask().execute();
                         }
                     }
@@ -148,9 +162,72 @@ public class StartChallengeActivity extends AppCompatActivity {
                     }
                 });
     }
+    int attemptsCount = 0;
+    int attemptsChecked = 0;
+    float guessesCount = 0;
 
+    /**
+     * Gets the current challenge's difficulty and displays it for the user
+     */
+    private void getDifficulty() {
+        mDatabase.child("attempt-by-challenge").child(currentChallenge.getId().toString())
+                .get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                        if (!task.isSuccessful()) {
+                            String str = "Error getting data: " + task.getException().getMessage();
+                            Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            Map<Object, String> attempts = (Map<Object, String>) task.getResult().getValue();
+                            if (attempts == null) {
+                                getChallenge();
+                                return;
+                            }
+                            attemptsCount = attempts.values().size();
+                            attemptsChecked = 0;
+                            guessesCount = 0;
+                            for (String attemptID:attempts.values()) {
+                                mDatabase.child("attempt").child(attemptID).get()
+                                        .addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                        Attempt attempt = new ObjectMapper().convertValue(task.getResult().getValue(), Attempt.class);
+                                        if (attempt == null) {
+                                            attemptsCount--;
+                                        }
+                                        else {
+                                            attemptsChecked++;
+                                            guessesCount += attempt.getGuesses().length;
+                                        }
+                                        if (attemptsCount == attemptsChecked) {
+                                            float avgGuesses = guessesCount/attemptsCount;
+                                            TextView difficultyView = findViewById(R.id.start_challenge_difficulty);
+                                            if (attemptsCount == 0) {
+                                                difficultyView.setText(String.format("Difficulty: medium"));
+                                            }
+                                            else if (avgGuesses < 2.5) {
+                                                difficultyView.setText(String.format("Difficulty: easy"));
+                                            }
+                                            else if (avgGuesses < 4.5) {
+                                                difficultyView.setText(String.format("Difficulty: medium"));
+                                            }
+                                            else {
+                                                difficultyView.setText(String.format("Difficulty: hard"));
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+    }
+
+    /**
+     * Retrieves the challenge image asynchronously and displays it to the user
+     */
     class RetrieveImageTask extends AsyncTask<Void, Void, Void> {
-
         @Override
         protected Void doInBackground(Void... voids) {
             URL newurl = null;
