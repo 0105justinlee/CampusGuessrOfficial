@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -41,6 +42,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class StartChallengeActivity extends AppCompatActivity {
+    private int challengesFetched = 0;
     private DatabaseReference mDatabase;
     private Challenge currentChallenge;
     JSONObject challengeObj;
@@ -181,7 +183,8 @@ public class StartChallengeActivity extends AppCompatActivity {
                         else {
                             Map<Object, String> attempts = (Map<Object, String>) task.getResult().getValue();
                             if (attempts == null) {
-                                getChallenge();
+                                TextView difficultyView = findViewById(R.id.start_challenge_difficulty);
+                                difficultyView.setText(String.format("Difficulty: medium"));
                                 return;
                             }
                             attemptsCount = attempts.values().size();
@@ -230,6 +233,12 @@ public class StartChallengeActivity extends AppCompatActivity {
     class RetrieveImageTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
+            challengesFetched++;
+            if (challengesFetched > 30) {
+                Looper.prepare();
+                Toast.makeText(getApplicationContext(), "Excessive bandwidth used, please try again", Toast.LENGTH_SHORT).show();
+                return null;
+            }
             URL newurl = null;
             final Bitmap mIcon_val;
             while (newurl == null) {
