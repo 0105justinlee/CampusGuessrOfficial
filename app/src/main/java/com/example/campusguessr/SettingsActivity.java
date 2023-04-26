@@ -58,9 +58,7 @@ public class SettingsActivity extends AppCompatActivity {
     usernameUpdated = false;
     desiredDistanceUpdated = false;
     desiredDifficultyUpdated = false;
-    
-    mDatabase.child("users").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-  
+    mDatabase.child("users").child(mAuth.getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
       @Override
       public void onComplete(@NonNull Task<DataSnapshot> task) {
         if (!task.isSuccessful()) {
@@ -68,38 +66,30 @@ public class SettingsActivity extends AppCompatActivity {
           Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
         }
         else {
-          DataSnapshot result = task.getResult();
-          Iterator iterator = result.getChildren().iterator();
-          for(int i = 0; i < result.getChildrenCount(); i++) {
-            DataSnapshot next = (DataSnapshot) iterator.next();
-            HashMap user = (HashMap) next.getValue();
-            if(user.get("name").equals(mAuth.getCurrentUser().getDisplayName())) {
-              // current user found
-              currentUser = new User();
-              Log.d(TAG, "onComplete: " + user.get("uid"));
-              
-              currentUser.setUid(user.get("uid").toString());
-              currentUser.setName(user.get("name").toString());
-              if(user.containsKey("desiredDistance")) {
-                currentUser.setDesiredDistance((int) user.get("desiredDistance"));
-              }
-              else {
-                currentUser.setDesiredDistance(50);
-              }
-              if(user.containsKey("desiredDifficulty")) {
-                currentUser.setDesiredDifficulty((int) user.get("desiredDifficulty"));
-              }
-              else {
-                currentUser.setDesiredDifficulty(50);
-              }
-              Long score = (Long) user.get("score");
-              currentUser.setScore(score.intValue());
-              Log.d(TAG, "onComplete: " + currentUser);
-              NewUsername.setText(currentUser.getName());
-              DesiredDistance.setProgress(currentUser.getDesiredDistance());
-              DesiredDifficulty.setProgress(currentUser.getDesiredDifficulty());
-            }
+          HashMap user = (HashMap) task.getResult().getValue();
+          currentUser = new User();
+          Log.d(TAG, "onComplete: " + user.get("uid"));
+  
+          currentUser.setUid(user.get("uid").toString());
+          currentUser.setName(user.get("name").toString());
+          if(user.containsKey("desiredDistance")) {
+            currentUser.setDesiredDistance((int) user.get("desiredDistance"));
           }
+          else {
+            currentUser.setDesiredDistance(50);
+          }
+          if(user.containsKey("desiredDifficulty")) {
+            currentUser.setDesiredDifficulty((int) user.get("desiredDifficulty"));
+          }
+          else {
+            currentUser.setDesiredDifficulty(50);
+          }
+          Long score = (Long) user.get("score");
+          currentUser.setScore(score.intValue());
+          Log.d(TAG, "onComplete: " + currentUser);
+          NewUsername.setText(currentUser.getName());
+          DesiredDistance.setProgress(currentUser.getDesiredDistance());
+          DesiredDifficulty.setProgress(currentUser.getDesiredDifficulty());
         }
       }
     });
@@ -158,12 +148,12 @@ public class SettingsActivity extends AppCompatActivity {
     DesiredDistance.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
       @Override
       public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-    
+        // do nothing
       }
   
       @Override
       public void onStartTrackingTouch(SeekBar seekBar) {
-    
+        // do nothing
       }
   
       @Override
