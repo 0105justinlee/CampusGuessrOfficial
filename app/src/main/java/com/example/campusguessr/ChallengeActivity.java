@@ -7,12 +7,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.campusguessr.POJOs.Attempt;
@@ -20,7 +24,6 @@ import com.example.campusguessr.POJOs.Challenge;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -30,8 +33,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FirebaseStorage;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -83,6 +88,8 @@ public class ChallengeActivity extends AppCompatActivity {
 
         // Initialize challenge for this session
         getChallenge();
+        new RetrieveImageTask().execute();
+        getInitialLocation();
 
         // Set up navigation menu
         RankingsButton.setOnClickListener(new View.OnClickListener() {
@@ -184,8 +191,8 @@ public class ChallengeActivity extends AppCompatActivity {
                     Map m = (Map<String, Object>) ds.getValue();
                     ObjectMapper mapper = new ObjectMapper();
                     Challenge challenge = mapper.convertValue(m, Challenge.class);
-                    Integer distance = challenge.getLocation().distanceTo(guesses[0]);
-                    int myScore = distance / guesses.length;
+                    Double distance = challenge.getLocation().distanceTo(guesses[0]);
+                    long myScore = Math.round((distance * 100.0) / guesses.length);
                     String uId = mAuth.getCurrentUser().getUid();
                     Date currentTime = Calendar.getInstance().getTime();
                     Log.d(TAG, "submitChallenge: " + myScore);
@@ -251,5 +258,56 @@ public class ChallengeActivity extends AppCompatActivity {
         });
 
         return f;
+    }
+
+    class RetrieveImageTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            URL newurl = null;
+            final Bitmap mIcon_val;
+            while (newurl == null) {
+                try {
+                    newurl = new URL(currentChallenge.getImageURL());
+                } catch (MalformedURLException e) {
+                    continue;
+                }
+            }
+            try {
+                mIcon_val = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            ImageView imageView = findViewById(R.id.start_challenge_image);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    imageView.setImageBitmap(mIcon_val);
+                }
+            });
+            return null;
+        }
+    }
+
+    /**
+     * Get initial location and add to list
+     */
+    private void getInitialLocation() {
+        // Check if permissions have been granted
+        int finePermissionsGranted = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION);
+        int coarsePermissionsGranted = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION);
+        if (finePermissionsGranted != PackageManager.PERMISSION_GRANTED && coarsePermissionsGranted != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        // Get location from location client
+        fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+                .addOnSuccessListener(ChallengeActivity.this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        if (location != null) {
+                            guessLocations.add(location);
+                        }
+                    }
+                });
     }
 }
