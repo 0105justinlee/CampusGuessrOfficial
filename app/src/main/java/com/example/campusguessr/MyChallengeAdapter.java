@@ -116,7 +116,7 @@ public class MyChallengeAdapter extends RecyclerView.Adapter<MyChallengeAdapter.
         final int deletePosition = i;
 
         ArrayList<String> valueArray = myChallenges.get(key);
-        Picasso.get().load(valueArray.get(2)).rotate(90f).resize(800,1000).centerCrop().into(viewHolder.getImageButton());
+        //Picasso.get().load(valueArray.get(2)).rotate(90f).resize(800,1000).centerCrop().into(viewHolder.getImageButton());
         //viewHolder.getTextView().setText(valueArray.get(2));
 
         viewHolder.getImageButton().setOnClickListener(new View.OnClickListener() {
@@ -147,7 +147,7 @@ public class MyChallengeAdapter extends RecyclerView.Adapter<MyChallengeAdapter.
 
                 ((TextView)popupView.findViewById(R.id.popup_delete_title)).setText(valueArray.get(0));
                 ((TextView)popupView.findViewById(R.id.popup_delete_description)).setText(valueArray.get(1));
-                Picasso.get().load(valueArray.get(2)).rotate(90f).resize(800,800).centerCrop().into((ImageButton) popupView.findViewById(R.id.popup_delete_image));
+                //Picasso.get().load(valueArray.get(2)).rotate(90f).resize(800,800).centerCrop().into((ImageButton) popupView.findViewById(R.id.popup_delete_image));
 
                 // dismiss popup window when touching cancel button
                 // popup window still dismisses when touching outside of it too
