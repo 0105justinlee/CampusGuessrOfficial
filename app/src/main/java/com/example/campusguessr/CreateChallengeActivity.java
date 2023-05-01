@@ -182,7 +182,7 @@ public class CreateChallengeActivity extends AppCompatActivity {
                 Toast.makeText(this, "Failed to upload challenge", Toast.LENGTH_SHORT).show();
                 return;
             }
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, StartChallengeActivity.class);
             startActivityForResult(intent, 0);
         }).addOnFailureListener(e -> {
             Toast.makeText(this, "Upload failed", Toast.LENGTH_SHORT).show();
