@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -216,10 +217,9 @@ public class CreateChallengeActivity extends AppCompatActivity {
      */
     private void checkDuplicate() {
         // Get a reference to the Firebase Realtime Database
-        String usernameString = mAuth.getCurrentUser().getDisplayName();
-        String userId = mAuth.getCurrentUser().getUid();
-
         DatabaseReference dbRef = mDatabase.child("challenges");
+
+        Log.d("checkDuplicate", "enter checkDuplicate");
 
         // Retrieve data from the database
         dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -249,6 +249,7 @@ public class CreateChallengeActivity extends AppCompatActivity {
 
                     // if duplicate suspected
                     if (distance < LOCATION_THRESHOLD && angleDiff < ANGLE_THRESHOLD) {
+                        Log.d("checkDuplicateConditionCheck", "duplicate suspected");
                         // Move to duplicate detect activity
                         Intent intent = new Intent(getApplicationContext(), DuplicateDetectActivity.class);
                         intent.putExtra("Duplicate Picture", childKey);
