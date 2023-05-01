@@ -52,28 +52,6 @@
                     app:layout_constraintTop_toBottomOf="@+id/profile_username" />
 
                 <TextView
-                    android:id="@+id/profile_week_points"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="52dp"
-                    android:layout_marginTop="12dp"
-                    android:text="0000 points this week"
-                    android:textSize="22sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/profile_total_points" />
-
-                <TextView
-                    android:id="@+id/profile_today_points"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="52dp"
-                    android:layout_marginTop="12dp"
-                    android:text="0000 points today"
-                    android:textSize="22sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/profile_week_points" />
-
-                <TextView
                     android:id="@+id/my_challenges"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -82,7 +60,7 @@
                     android:text="My Challenges:"
                     android:textSize="35sp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/profile_today_points" />
+                    app:layout_constraintTop_toBottomOf="@+id/profile_total_points" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerview_my_challenges"
