@@ -79,5 +79,13 @@ public class DuplicateDetectActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        yesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setResult(Activity.RESULT_OK);
+                finish();
+            }
+        });
     }
 }

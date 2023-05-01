@@ -72,6 +72,27 @@ public class ProfileActivity extends AppCompatActivity {
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
+        // query to find username and total points
+        Query usernameQuery = mDatabase.child("users").orderByChild("uid").equalTo(userId);
+        usernameQuery.addValueEventListener(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                TextView username = findViewById(R.id.profile_username);
+                TextView totalPoints = findViewById(R.id.profile_total_points);
+                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                    username.setText((String)postSnapshot.child("name").getValue());
+                    String value = (String)postSnapshot.child("score").getValue().toString();
+                    totalPoints.setText(value + " points total");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getBaseContext(), "Failed to retrieve username", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         // database query to retrieve user's submitted challenges
         Query myChallengesQuery = mDatabase.child("challenges").orderByChild("createdBy").equalTo(userId);
         myChallengesQuery.addValueEventListener(new ValueEventListener() {
