@@ -34,7 +34,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
-public class CreateChallengeActivity extends AppCompatActivity {
+public class CreateChallengeActivity extends AppCompatActivity implements ValueEventListener {
     private final String TAG = "Create Challenge";
 
     private double[] location = new double[2];
@@ -50,6 +50,18 @@ public class CreateChallengeActivity extends AppCompatActivity {
     private FirebaseStorage storage;
 
     private DatabaseReference mDatabase;
+
+    private DataSnapshot dataSnapshot;
+
+    @Override
+    public void onDataChange(DataSnapshot dataSnapshot) {
+        this.dataSnapshot = dataSnapshot;
+    }
+    @Override
+    public void onCancelled(DatabaseError databaseError) {
+        // Handle any errors
+        System.out.println("Database error: " + databaseError.getMessage());
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +115,11 @@ public class CreateChallengeActivity extends AppCompatActivity {
             editTextString = savedInstanceState.getString("descriptionText");
             descriptionText.setText(editTextString);
         }
+
+        // Get a reference to the Firebase Realtime Database
+        DatabaseReference dbRef = mDatabase.child("challenges");
+        // Retrieve data from the database
+        dbRef.addValueEventListener(this);
     }
 
     @Override
@@ -191,9 +208,9 @@ public class CreateChallengeActivity extends AppCompatActivity {
 
     // Calculate orientation diff
     private double angleDiff(float[] orientationValues, double X, double Y, double Z) {
-        double deltaAzimuth = Math.abs(Math.toDegrees(orientationValues[0]) - X);
-        double deltaPitch = Math.abs(Math.toDegrees(orientationValues[1]) - Y);
-        double deltaRoll = Math.abs(Math.toDegrees(orientationValues[2]) - Z);
+        double deltaAzimuth = Math.abs(orientationValues[0] - X);
+        double deltaPitch = Math.abs(orientationValues[1] - Y);
+        double deltaRoll = Math.abs(orientationValues[2] - Z);
 
         double angleDiff = Math.sqrt(Math.pow(deltaAzimuth, 2) + Math.pow(deltaPitch, 2) + Math.pow(deltaRoll, 2));
         return angleDiff;
@@ -216,46 +233,40 @@ public class CreateChallengeActivity extends AppCompatActivity {
      * Method to check duplicate and open duplicate detect activity
      */
     private void checkDuplicate() {
-        // Get a reference to the Firebase Realtime Database
-        DatabaseReference dbRef = mDatabase.child("challenges");
-
         Log.d("checkDuplicate", "enter checkDuplicate");
 
-        // Retrieve data from the database
-        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // Loop through each child node
-                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-                    // Retrieve the child's key and data
-                    String childKey = childSnapshot.getKey();
 
-                    // Location variables
-                    double curLatitude =
-                            Double.parseDouble(childSnapshot.child("location").child("latitude").getValue().toString());
-                    double curLongitude =
-                            Double.parseDouble(childSnapshot.child("location").child("longitude").getValue().toString());
-                    // Calculate the distance between the current coordinates and the coordinates in the database
-                    double distance = distance(location[0], location[1], curLatitude, curLongitude);
-                    double LOCATION_THRESHOLD = 0.2;  // 200 meters -> Can modify
+        // Loop through each child node
+        for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+            // Retrieve the child's key and data
+            String childKey = childSnapshot.getKey();
 
-                    // Orientation variables
-                    float curX = Float.parseFloat(childSnapshot.child("orientation").child("x").getValue().toString());
-                    float curY = Float.parseFloat(childSnapshot.child("orientation").child("y").getValue().toString());
-                    float curZ = Float.parseFloat(childSnapshot.child("orientation").child("z").getValue().toString());
-                    float ANGLE_THRESHOLD = 60.0f; // 60 degrees -> Can modify
-                    // Calculate the difference in orientation between the current and database values
-                    double angleDiff = angleDiff(orientation, curX, curY, curZ);
+            // Location variables
+            double curLatitude =
+                    Double.parseDouble(childSnapshot.child("location").child("latitude").getValue().toString());
+            double curLongitude =
+                    Double.parseDouble(childSnapshot.child("location").child("longitude").getValue().toString());
+            // Calculate the distance between the current coordinates and the coordinates in the database
+            double distance = distance(location[0], location[1], curLatitude, curLongitude);
+            double LOCATION_THRESHOLD = 0.2;  // 200 meters -> Can modify
 
-                    // if duplicate suspected
-                    if (distance < LOCATION_THRESHOLD && angleDiff < ANGLE_THRESHOLD) {
-                        Log.d("checkDuplicateConditionCheck", "duplicate suspected");
-                        // Move to duplicate detect activity
-                        Intent intent = new Intent(getApplicationContext(), DuplicateDetectActivity.class);
-                        intent.putExtra("Duplicate Picture", childKey);
-                        intent.putExtra("photoPath", photoPath);
-                        startActivityForResult(intent, 1);
-                    }
+            // Orientation variables
+            float curX = Float.parseFloat(childSnapshot.child("orientation").child("x").getValue().toString());
+            float curY = Float.parseFloat(childSnapshot.child("orientation").child("y").getValue().toString());
+            float curZ = Float.parseFloat(childSnapshot.child("orientation").child("z").getValue().toString());
+            float ANGLE_THRESHOLD = 60.0f; // 60 degrees -> Can modify
+            // Calculate the difference in orientation between the current and database values
+            double angleDiff = angleDiff(orientation, curX, curY, curZ);
+
+            // if duplicate suspected
+            if (distance < LOCATION_THRESHOLD && angleDiff < ANGLE_THRESHOLD) {
+                Log.d("checkDuplicateConditionCheck", "duplicate suspected");
+                // Move to duplicate detect activity
+                Intent intent = new Intent(getApplicationContext(), DuplicateDetectActivity.class);
+                intent.putExtra("Duplicate Picture", childKey);
+                intent.putExtra("photoPath", photoPath);
+                startActivityForResult(intent, 1);
+            }
 
 //                    if (Math.abs(location[0] - curLatitude) < 5 && Math.abs(location[1] - curLongitude) < 5 && Math.abs(curX - orientation[0]) < 5 && Math.abs(curY - orientation[1]) < 5 && Math.abs(curZ - orientation[2]) < 5) {
 //                        // Move to duplicate detect activity
@@ -264,14 +275,9 @@ public class CreateChallengeActivity extends AppCompatActivity {
 //                        intent.putExtra("photoPath", photoPath);
 //                        startActivityForResult(intent, 1);
 //                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Handle any errors
-                System.out.println("Database error: " + databaseError.getMessage());
-            }
-        });
+//                }
+//            }
+//
+        }
     }
 }
