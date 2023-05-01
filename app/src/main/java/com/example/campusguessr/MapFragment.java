@@ -67,19 +67,32 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap = googleMap;
 
         MarkerOptions startMarker = new MarkerOptions();
-        // Add markers for each location
+        // Add markers for each location and add poly line connecting all locations
         for (Location loc : locations) {
             LatLng latLng = new LatLng(loc.getLatitude(), loc.getLongitude());
             if (locations.indexOf(loc) == 0) {
                 mMap.addMarker(startMarker.position(latLng).title("Start"));
-            }
-            else if (locations.indexOf(loc) == locations.size() - 1) {
+            } else if (locations.indexOf(loc) == locations.size() - 1) {
                 mMap.addMarker(new MarkerOptions().position(latLng).title("End"));
-            }
-            else {
+            } else {
                 mMap.addMarker(new MarkerOptions().position(latLng).title("Attempt " + (locations.indexOf(loc))));
             }
+
+            // add thick red polyline with arrows
+            if (locations.indexOf(loc) > 0) {
+                Location prevLoc = locations.get(locations.indexOf(loc) - 1);
+                LatLng prevLatLng = new LatLng(prevLoc.getLatitude(), prevLoc.getLongitude());
+                mMap.addPolyline(new com.google.android.gms.maps.model.PolylineOptions()
+                        .add(prevLatLng, latLng)
+                        .width(20)
+                        .color(R.color.red)
+                        .geodesic(true)
+                        .startCap(new com.google.android.gms.maps.model.RoundCap())
+                        .endCap(new com.google.android.gms.maps.model.RoundCap())
+                );
+            }
         }
+
         mMap.moveCamera(CameraUpdateFactory.newLatLng(startMarker.getPosition()));
         mMap.setMinZoomPreference(17.0f);
     }

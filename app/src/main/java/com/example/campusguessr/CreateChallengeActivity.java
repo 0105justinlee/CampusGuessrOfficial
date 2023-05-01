@@ -100,6 +100,7 @@ public class CreateChallengeActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
         Bundle extras = intent.getExtras();
         if (resultCode == RESULT_OK) {
             location = extras.getDoubleArray("location");
@@ -131,22 +132,14 @@ public class CreateChallengeActivity extends AppCompatActivity {
         StorageReference storageRef = storage.getReference("challenges/" + c1.getId().toString() + ".jpg");
         UploadTask task = storageRef.putFile(Uri.fromFile(new File(photoPath)));
         task.addOnSuccessListener(taskSnapshot -> {
-            Toast.makeText(this, "Upload successful", Toast.LENGTH_SHORT).show();
-            try {
-                storageRef.getDownloadUrl().onSuccessTask(uri -> {
-                    c1.setImageURL(uri.toString());
-                    Map c1Map = new ObjectMapper().convertValue(c1, Map.class);
-                    mDatabase.child("challenges").child(c1.getId().toString()).setValue(c1Map);
-                    return null;
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to upload challenge", Toast.LENGTH_SHORT).show();
-                    return;
-                });
-            } catch (Exception e) {
-                Toast.makeText(this, "Failed to upload challenge", Toast.LENGTH_SHORT).show();
-                return;
-            }
+            storageRef.getDownloadUrl().onSuccessTask(uri -> {
+                c1.setImageURL(uri.toString());
+                Map c1Map = new ObjectMapper().convertValue(c1, Map.class);
+                return mDatabase.child("challenges").child(c1.getId().toString()).setValue(c1Map);
+            })
+            .addOnSuccessListener(aVoid -> {
+                Toast.makeText(this, "Upload successful", Toast.LENGTH_SHORT).show();
+            });
             Intent intent = new Intent(this, StartChallengeActivity.class);
             startActivityForResult(intent, 0);
         }).addOnFailureListener(e -> {
