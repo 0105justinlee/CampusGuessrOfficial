@@ -14,12 +14,12 @@
     <string name="scoreTitle">Score:</string>
     <string name="duplicate_detect_question">Are these photos the same?</string>
     <string name="duplicate_detect_may_exist">This challenge may already exist</string>
-    <string name="desired_distance_input">Desired Distance:</string>
-    <string name="desired_distance_min">Very Close</string>
-    <string name="desired_distance_max">Very Far</string>
+    <string name="desired_distance_input">Maximum Distance:</string>
+    <string name="desired_distance_min">0</string>
+    <string name="desired_distance_max">1 mile</string>
     <string name="desired_difficulty_input">Desired Difficulty:</string>
-    <string name="desired_difficulty_min">Very Easy</string>
-    <string name="desired_difficulty_max">Very Hard</string>
+    <string name="desired_difficulty_min">Easy</string>
+    <string name="desired_difficulty_max">Hard</string>
     <string name="enter_username_direction">Enter username</string>
     <string name="submit_button_text">Submit</string>
 </resources>

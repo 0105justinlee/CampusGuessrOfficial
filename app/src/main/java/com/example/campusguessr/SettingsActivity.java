@@ -200,8 +200,8 @@ public class SettingsActivity extends AppCompatActivity {
   }
   
   @Override
-  protected void onStop() {
-    super.onStop();
+  protected void onPause() {
+    super.onPause();
     // push new username
     if (usernameUpdated || desiredDistanceUpdated || desiredDifficultyUpdated) {
       HashMap map = new HashMap();

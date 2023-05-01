@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.example.campusguessr.POJOs.Attempt;
 import com.example.campusguessr.POJOs.Challenge;
+import com.example.campusguessr.POJOs.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -28,6 +29,7 @@ import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -38,12 +40,16 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class StartChallengeActivity extends AppCompatActivity {
+    private int maxDistance;
+    private float desiredDifficulty;
     private int challengesFetched = 0;
     private DatabaseReference mDatabase;
+    private FirebaseAuth mAuth;
+    private Challenge oldChallenge;
     private Challenge currentChallenge;
     JSONObject challengeObj;
     @Override
@@ -51,12 +57,14 @@ public class StartChallengeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.start_challenge);
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        getChallenge();
+        mAuth = FirebaseAuth.getInstance();
         Button startChallengeButton = (Button) findViewById(R.id.start_challenge_button);
         Button rerollButton = findViewById(R.id.reroll_button);
         ImageButton rankingsButton = (ImageButton) findViewById(R.id.navigate_ranking_tab_button);
         ImageButton createButton = (ImageButton) findViewById(R.id.navigate_create_tab_button);
         ImageButton profileButton = (ImageButton) findViewById(R.id.navigate_profile_tab_button);
+        getSettings();
+        getChallenge();
         startChallengeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,12 +105,14 @@ public class StartChallengeActivity extends AppCompatActivity {
         });
     }
 
+    private AtomicInteger toCheck;
+
     /**
      * Gets a random challenge from the Firebase real time database and stores to currentChallenge
      */
     private void getChallenge() {
         mDatabase.child("challenges").orderByKey().startAt(UUID.randomUUID().toString())
-                .limitToFirst(1).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                .limitToFirst(10).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DataSnapshot> task) {
                         if (!task.isSuccessful()) {
@@ -111,23 +121,26 @@ public class StartChallengeActivity extends AppCompatActivity {
                         }
                         else {
                             DataSnapshot dataSnapshot = task.getResult();
-                            DataSnapshot childSnap;
-                            try {
-                                childSnap = dataSnapshot.getChildren().iterator().next();
-                            } catch (NoSuchElementException e) {
-                                getChallenge(); // Reroll if there is a problem with the challenge fetched
+                            if (!dataSnapshot.hasChildren()) {
+                                // If random UUID excluded all entries, try again
+                                getChallenge();
                                 return;
                             }
-                            challengeObj = new JSONObject((Map) childSnap.getValue());
-                            Challenge newChallenge = new ObjectMapper().convertValue(childSnap.getValue(), Challenge.class);
-                            if (currentChallenge != null && newChallenge.getId().equals(currentChallenge.getId())) {
-                                getChallenge(); // If rerolling, avoid duplicating challenge
-                                return;
+                            toCheck = new AtomicInteger((int) dataSnapshot.getChildrenCount());
+                            ((ImageView) findViewById(R.id.start_challenge_image)).setImageBitmap(null);
+                            currentChallenge = null;
+                            for (DataSnapshot childSnap:dataSnapshot.getChildren()) {
+                                JSONObject currentChallengeObj = new JSONObject((Map) childSnap.getValue());
+                                Challenge newChallenge = new ObjectMapper().convertValue(childSnap.getValue(), Challenge.class);
+                                if (oldChallenge != null && newChallenge.getId().toString().equals(oldChallenge.getId().toString())) {
+                                    toCheck.getAndAdd(-1);
+                                    if (toCheck.get() == 0) {
+                                        getChallenge();
+                                    }
+                                    continue;
+                                }
+                                getLocation(newChallenge, currentChallengeObj);
                             }
-                            currentChallenge = newChallenge;
-                            getLocation();
-                            getDifficulty();
-                            new RetrieveImageTask().execute();
                         }
                     }
                 });
@@ -137,7 +150,7 @@ public class StartChallengeActivity extends AppCompatActivity {
      * Gets the current location and compares it with the challenge goal
      * Displays distance from challenge location
      */
-    private void getLocation() {
+    private void getLocation(Challenge challenge, JSONObject challengeObj) {
         // Check if permissions have been granted
         int finePermissionsGranted = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION);
         int coarsePermissionsGranted = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION);
@@ -153,26 +166,28 @@ public class StartChallengeActivity extends AppCompatActivity {
                     public void onSuccess(Location location) {
                         if (location != null) {
                             double[] currentCoords = new double[]{location.getLatitude(), location.getLongitude()};
-                            com.example.campusguessr.POJOs.Location challengeLocation = currentChallenge.getLocation();
+                            com.example.campusguessr.POJOs.Location challengeLocation = challenge.getLocation();
                             double distance_latitude = (currentCoords[0]- challengeLocation.getLatitude())*364000;
                             double distance_longitude = (currentCoords[1]-challengeLocation.getLongitude())*288200;
                             int distance = (int) Math.sqrt(distance_latitude*distance_latitude+distance_longitude*distance_longitude);
-                            TextView distanceTextView = findViewById(R.id.start_challenge_distance);
-                            String distanceText = "Distance: " + distance + " feet";
-                            distanceTextView.setText(distanceText);
+                            if (distance > maxDistance) {
+                                toCheck.getAndAdd(-1);
+                                if (toCheck.get() == 0) {
+                                    getChallenge();
+                                }
+                                return;
+                            }
+                            getDifficulty(challenge, distance, challengeObj);
                         }
                     }
                 });
     }
-    int attemptsCount = 0;
-    int attemptsChecked = 0;
-    float guessesCount = 0;
 
     /**
      * Gets the current challenge's difficulty and displays it for the user
      */
-    private void getDifficulty() {
-        mDatabase.child("attempt-by-challenge").child(currentChallenge.getId().toString())
+    private void getDifficulty(Challenge challenge, int distance, JSONObject challengeObj) {
+        mDatabase.child("attempt-by-challenge").child(challenge.getId().toString())
                 .get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -183,40 +198,66 @@ public class StartChallengeActivity extends AppCompatActivity {
                         else {
                             Map<Object, String> attempts = (Map<Object, String>) task.getResult().getValue();
                             if (attempts == null) {
+                                if (currentChallenge != null) {
+                                    return;
+                                }
                                 TextView difficultyView = findViewById(R.id.start_challenge_difficulty);
                                 difficultyView.setText(String.format("Difficulty: medium"));
+                                currentChallenge = challenge;
+                                StartChallengeActivity.this.challengeObj = challengeObj;
+                                oldChallenge = challenge;
+                                TextView distanceTextView = findViewById(R.id.start_challenge_distance);
+                                String distanceText = "Distance: " + distance + " feet";
+                                distanceTextView.setText(distanceText);
+                                new RetrieveImageTask().execute();
                                 return;
                             }
-                            attemptsCount = attempts.values().size();
-                            attemptsChecked = 0;
-                            guessesCount = 0;
+                            AtomicInteger attemptsCount = new AtomicInteger(attempts.values().size());
+                            AtomicInteger attemptsChecked = new AtomicInteger(0);
+                            AtomicInteger guessesCount = new AtomicInteger(0);
                             for (String attemptID:attempts.values()) {
-                                mDatabase.child("attempt").child(attemptID).get()
+                                mDatabase.child("attempts").child(attemptID).get()
                                         .addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<DataSnapshot> task) {
                                         Attempt attempt = new ObjectMapper().convertValue(task.getResult().getValue(), Attempt.class);
                                         if (attempt == null) {
-                                            attemptsCount--;
+                                            attemptsCount.getAndAdd(-1);
                                         }
                                         else {
-                                            attemptsChecked++;
-                                            guessesCount += attempt.getGuesses().length;
+                                            attemptsChecked.getAndAdd(1);
+                                            guessesCount.getAndAdd(attempt.getGuesses().length);
                                         }
-                                        if (attemptsCount == attemptsChecked) {
-                                            float avgGuesses = guessesCount/attemptsCount;
-                                            TextView difficultyView = findViewById(R.id.start_challenge_difficulty);
-                                            if (attemptsCount == 0) {
-                                                difficultyView.setText(String.format("Difficulty: medium"));
-                                            }
-                                            else if (avgGuesses < 2.5) {
-                                                difficultyView.setText(String.format("Difficulty: easy"));
-                                            }
-                                            else if (avgGuesses < 4.5) {
-                                                difficultyView.setText(String.format("Difficulty: medium"));
-                                            }
-                                            else {
-                                                difficultyView.setText(String.format("Difficulty: hard"));
+                                        if (attemptsCount.get() == attemptsChecked.get()) {
+                                            if (currentChallenge == null) {
+                                                float avgGuesses = (float) guessesCount.get() / attemptsCount.get();
+                                                if (desiredDifficulty == 0 && avgGuesses > 2.5
+                                                        || desiredDifficulty == 1 && (avgGuesses > 4.5 || avgGuesses < 2.5)
+                                                        || desiredDifficulty == 2 && avgGuesses < 4.5) {
+                                                    toCheck.getAndAdd(-1);
+                                                    if (toCheck.get() == 0) {
+                                                        getChallenge();
+                                                    }
+                                                    return;
+                                                }
+                                                TextView difficultyView = findViewById(R.id.start_challenge_difficulty);
+                                                if (attemptsCount.get() == 0) {
+                                                    // Default difficulty medium if challenge is unattempted
+                                                    difficultyView.setText(String.format("Difficulty: medium"));
+                                                } else if (avgGuesses < 2.5) {
+                                                    difficultyView.setText(String.format("Difficulty: easy"));
+                                                } else if (avgGuesses < 4.5) {
+                                                    difficultyView.setText(String.format("Difficulty: medium"));
+                                                } else {
+                                                    difficultyView.setText(String.format("Difficulty: hard"));
+                                                }
+                                                currentChallenge = challenge;
+                                                StartChallengeActivity.this.challengeObj = challengeObj;
+                                                oldChallenge = challenge;
+                                                TextView distanceTextView = findViewById(R.id.start_challenge_distance);
+                                                String distanceText = "Distance: " + distance + " feet";
+                                                distanceTextView.setText(distanceText);
+                                                new RetrieveImageTask().execute();
                                             }
                                         }
                                     }
@@ -225,6 +266,31 @@ public class StartChallengeActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    private void getSettings() {
+        String userId = mAuth.getCurrentUser().getUid();
+        mDatabase.child("users").child(userId).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (!task.isSuccessful()) {
+                    String str = "Error getting data: " + task.getException().getMessage();
+                    Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
+                }
+                User currentUser = new ObjectMapper().convertValue(task.getResult().getValue(), User.class);
+                maxDistance = currentUser.getDesiredDistance()*5280/100;
+                int userDifficulty = currentUser.getDesiredDifficulty();
+                if (userDifficulty < 34) {
+                    desiredDifficulty = 0; // easy
+                }
+                else if (userDifficulty < 67) {
+                    desiredDifficulty = 1; // medium
+                }
+                else {
+                    desiredDifficulty = 2; // hard
+                }
+            }
+        });
     }
 
     /**
