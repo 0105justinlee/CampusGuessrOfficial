@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.example.campusguessr.POJOs.Attempt;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -66,6 +67,8 @@ public class CompleteChallengeActivity extends FragmentActivity {
       }
     });
 
+    TextView scoreText = findViewById(R.id.score_title);
+
     String attemptId = getIntent().getStringExtra("attemptId");
     database.getReference().child("attempts").child(attemptId).get().addOnCompleteListener(task -> {
       if (task.isSuccessful()) {
@@ -73,6 +76,7 @@ public class CompleteChallengeActivity extends FragmentActivity {
         ObjectMapper mapper = new ObjectMapper();
         attempt = mapper.convertValue(m, Attempt.class);
         getSupportFragmentManager().beginTransaction().add(R.id.map_fragment, new MapFragment(attempt.getGuesses())).commit();
+        scoreText.setText("Score: " + attempt.getScore());
       }
     });
 

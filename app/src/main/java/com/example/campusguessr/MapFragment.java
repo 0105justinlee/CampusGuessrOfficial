@@ -1,6 +1,7 @@
 package com.example.campusguessr;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
+    private static final String TAG = "MapFragment";
     List<Location> locations;
     private GoogleMap mMap;
     MapView mMapView;
@@ -68,7 +70,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         MarkerOptions startMarker = new MarkerOptions();
         // Add markers for each location and add poly line connecting all locations
-        for (Location loc : locations) {
+        for (int idx = 0; idx < locations.size(); idx++) {
+            Location loc = locations.get(idx);
             LatLng latLng = new LatLng(loc.getLatitude(), loc.getLongitude());
             if (locations.indexOf(loc) == 0) {
                 mMap.addMarker(startMarker.position(latLng).title("Start"));
@@ -79,8 +82,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
 
             // add thick red polyline with arrows
-            if (locations.indexOf(loc) > 0) {
-                Location prevLoc = locations.get(locations.indexOf(loc) - 1);
+            if (idx > 0) {
+                Location prevLoc = locations.get(idx - 1);
                 LatLng prevLatLng = new LatLng(prevLoc.getLatitude(), prevLoc.getLongitude());
                 mMap.addPolyline(new com.google.android.gms.maps.model.PolylineOptions()
                         .add(prevLatLng, latLng)
@@ -90,6 +93,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         .startCap(new com.google.android.gms.maps.model.RoundCap())
                         .endCap(new com.google.android.gms.maps.model.RoundCap())
                 );
+                Log.d(TAG, "onMapReady: added polyline from " + prevLatLng.toString() + " to " + latLng.toString());
             }
         }
 
