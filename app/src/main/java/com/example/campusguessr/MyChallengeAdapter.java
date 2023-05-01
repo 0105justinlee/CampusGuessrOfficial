@@ -53,6 +53,8 @@ public class MyChallengeAdapter extends RecyclerView.Adapter<MyChallengeAdapter.
         private final ImageButton imageButton;
         private final ImageButton popupImage;
 
+        private final Button myChallengeButton;
+
         public ViewHolder(View view) {
             super(view);
             // Define click listener for the ViewHolder's View
@@ -60,6 +62,7 @@ public class MyChallengeAdapter extends RecyclerView.Adapter<MyChallengeAdapter.
             textView = (TextView) view.findViewById(R.id.textView);
             imageButton = view.findViewById(R.id.my_challenge_image);
             popupImage = view.findViewById(R.id.popup_delete_image);
+            myChallengeButton = view.findViewById(R.id.my_challenge_button);
         }
 
         public TextView getTextView() {
@@ -71,6 +74,8 @@ public class MyChallengeAdapter extends RecyclerView.Adapter<MyChallengeAdapter.
         }
 
         public ImageButton getPopupImage() { return popupImage; }
+
+        public Button getMyChallengeButton() { return myChallengeButton; }
     }
 
     /**
@@ -89,7 +94,7 @@ public class MyChallengeAdapter extends RecyclerView.Adapter<MyChallengeAdapter.
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         // Create a new view, which defines the UI of the list item
         View view = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.recyclerview_mychallenges, viewGroup, false);
+                .inflate(R.layout.recycler_mychallengebutton, viewGroup, false);
 
         return new ViewHolder(view);
     }
@@ -117,13 +122,13 @@ public class MyChallengeAdapter extends RecyclerView.Adapter<MyChallengeAdapter.
 
         ArrayList<String> valueArray = myChallenges.get(key);
         //Picasso.get().load(valueArray.get(2)).rotate(90f).resize(800,1000).centerCrop().into(viewHolder.getImageButton());
-        //viewHolder.getTextView().setText(valueArray.get(2));
+        viewHolder.getMyChallengeButton().setText(valueArray.get(0));
 
-        viewHolder.getImageButton().setOnClickListener(new View.OnClickListener() {
+        viewHolder.getMyChallengeButton().setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 // inflate the layout of the popup window
                 LayoutInflater inflater = (LayoutInflater)
-                        viewHolder.getImageButton().getContext().getSystemService(viewHolder.getImageButton().getContext().LAYOUT_INFLATER_SERVICE);
+                        viewHolder.getMyChallengeButton().getContext().getSystemService(viewHolder.getMyChallengeButton().getContext().LAYOUT_INFLATER_SERVICE);
                 View popupView = inflater.inflate(R.layout.popup_delete_challenge, null);
 
                 // create the popup window
@@ -134,7 +139,7 @@ public class MyChallengeAdapter extends RecyclerView.Adapter<MyChallengeAdapter.
 
                 // show the popup window
                 // which view you pass in doesn't matter, it is only used for the window tolken
-                popupWindow.showAtLocation(viewHolder.getImageButton(), Gravity.CENTER, 0, 0);
+                popupWindow.showAtLocation(viewHolder.getMyChallengeButton(), Gravity.CENTER, 0, 0);
 
                 // dim background when popup shows up
                 Context context = popupWindow.getContentView().getContext();
@@ -147,7 +152,7 @@ public class MyChallengeAdapter extends RecyclerView.Adapter<MyChallengeAdapter.
 
                 ((TextView)popupView.findViewById(R.id.popup_delete_title)).setText(valueArray.get(0));
                 ((TextView)popupView.findViewById(R.id.popup_delete_description)).setText(valueArray.get(1));
-                //Picasso.get().load(valueArray.get(2)).rotate(90f).resize(800,800).centerCrop().into((ImageButton) popupView.findViewById(R.id.popup_delete_image));
+                Picasso.get().load(valueArray.get(2)).rotate(90f).resize(800,800).centerCrop().into((ImageButton) popupView.findViewById(R.id.popup_delete_image));
 
                 // dismiss popup window when touching cancel button
                 // popup window still dismisses when touching outside of it too
