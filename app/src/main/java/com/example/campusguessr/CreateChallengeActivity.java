@@ -247,6 +247,9 @@ public class CreateChallengeActivity extends AppCompatActivity {
                     // Calculate the difference in orientation between the current and database values
                     double angleDiff = angleDiff(orientation, curX, curY, curZ);
 
+                    Log.d("checkDuplicate variable check latitude", Double.toString(curLatitude));
+                    Log.d("checkDuplicate variable check longitude", Double.toString(curLongitude));
+
                     // if duplicate suspected
                     if (distance < LOCATION_THRESHOLD && angleDiff < ANGLE_THRESHOLD) {
                         Log.d("checkDuplicateConditionCheck", "duplicate suspected");
@@ -255,6 +258,7 @@ public class CreateChallengeActivity extends AppCompatActivity {
                         intent.putExtra("Duplicate Picture", childKey);
                         intent.putExtra("photoPath", photoPath);
                         startActivityForResult(intent, 1);
+                        break;
                     }
 
 //                    if (Math.abs(location[0] - curLatitude) < 5 && Math.abs(location[1] - curLongitude) < 5 && Math.abs(curX - orientation[0]) < 5 && Math.abs(curY - orientation[1]) < 5 && Math.abs(curZ - orientation[2]) < 5) {
