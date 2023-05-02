@@ -1,6 +1,7 @@
 package com.example.campusguessr;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
+    private static final String TAG = "MapFragment";
     List<Location> locations;
     private GoogleMap mMap;
     MapView mMapView;
@@ -67,19 +69,34 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap = googleMap;
 
         MarkerOptions startMarker = new MarkerOptions();
-        // Add markers for each location
-        for (Location loc : locations) {
+        // Add markers for each location and add poly line connecting all locations
+        for (int idx = 0; idx < locations.size(); idx++) {
+            Location loc = locations.get(idx);
             LatLng latLng = new LatLng(loc.getLatitude(), loc.getLongitude());
             if (locations.indexOf(loc) == 0) {
                 mMap.addMarker(startMarker.position(latLng).title("Start"));
-            }
-            else if (locations.indexOf(loc) == locations.size() - 1) {
+            } else if (locations.indexOf(loc) == locations.size() - 1) {
                 mMap.addMarker(new MarkerOptions().position(latLng).title("End"));
-            }
-            else {
+            } else {
                 mMap.addMarker(new MarkerOptions().position(latLng).title("Attempt " + (locations.indexOf(loc))));
             }
+
+            // add thick red polyline with arrows
+            if (idx > 0) {
+                Location prevLoc = locations.get(idx - 1);
+                LatLng prevLatLng = new LatLng(prevLoc.getLatitude(), prevLoc.getLongitude());
+                mMap.addPolyline(new com.google.android.gms.maps.model.PolylineOptions()
+                        .add(prevLatLng, latLng)
+                        .width(20)
+                        .color(R.color.red)
+                        .geodesic(true)
+                        .startCap(new com.google.android.gms.maps.model.RoundCap())
+                        .endCap(new com.google.android.gms.maps.model.RoundCap())
+                );
+                Log.d(TAG, "onMapReady: added polyline from " + prevLatLng.toString() + " to " + latLng.toString());
+            }
         }
+
         mMap.moveCamera(CameraUpdateFactory.newLatLng(startMarker.getPosition()));
         mMap.setMinZoomPreference(17.0f);
     }

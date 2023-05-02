@@ -1,5 +1,7 @@
 package com.example.campusguessr;
 
+import static java.util.Collections.reverse;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,6 +22,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 
@@ -97,7 +100,7 @@ public class RankingsActivity extends AppCompatActivity {
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         DatabaseReference ref = mDatabase.child("users");
-        ref.orderByChild("score").limitToFirst(10).addValueEventListener(new ValueEventListener() {
+        ref.orderByChild("score").limitToLast(10).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 //                Log.d(TAG, "onDataChange: " + dataSnapshot);
@@ -105,7 +108,7 @@ public class RankingsActivity extends AppCompatActivity {
                 int i = 0;
                 for (DataSnapshot child : dataSnapshot.getChildren()) {
                     User user = mapper.convertValue(child.getValue(), User.class);
-                    users.add(user);
+                    users.add(0, user);
                     i++;
                     mAdapter.notifyDataSetChanged();
                 }
