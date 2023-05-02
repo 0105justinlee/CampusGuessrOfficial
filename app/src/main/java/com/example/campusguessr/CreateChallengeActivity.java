@@ -181,6 +181,7 @@ public class CreateChallengeActivity extends AppCompatActivity implements ValueE
      * Method to check duplicate and open duplicate detect activity
      */
     private void checkDuplicate() {
+        boolean flag = false;
         // Loop through each child node
         for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
             // Retrieve the child's key and data
@@ -205,6 +206,7 @@ public class CreateChallengeActivity extends AppCompatActivity implements ValueE
 
             // if duplicate suspected
             if (distance < LOCATION_THRESHOLD && angleDiff < ANGLE_THRESHOLD) {
+                flag = true;
                 // Move to duplicate detect activity
                 Intent intent = new Intent(getApplicationContext(), DuplicateDetectActivity.class);
                 intent.putExtra("Duplicate Picture", childKey);
@@ -212,6 +214,10 @@ public class CreateChallengeActivity extends AppCompatActivity implements ValueE
                 duplicateDetectLauncher.launch(intent);
                 break;
             }
+        }
+
+        if (!flag) {
+            passCheck();
         }
     }
 
