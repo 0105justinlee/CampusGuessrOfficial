@@ -144,8 +144,7 @@ public class ChallengeActivity extends AppCompatActivity {
                             guessLocations.add(location);
                             adapter.notifyItemInserted(guesses.size()-1);
 
-//                            if (distance < 50) {
-                            if (distance < 50 || guesses.size() == 2) { // TODO: remove this line when testing is done
+                            if (distance < 50) {
                                 Toast.makeText(ChallengeActivity.this, "You won!", Toast.LENGTH_SHORT).show();
                                 // covert guessLocations to com.example.campusguessr.POJOs.Location[]
                                 com.example.campusguessr.POJOs.Location[] guessesMade = new com.example.campusguessr.POJOs.Location[guessLocations.size()];
