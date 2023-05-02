@@ -6,12 +6,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.campusguessr.POJOs.Challenge;
@@ -134,27 +138,20 @@ public class CreateChallengeActivity extends AppCompatActivity implements ValueE
         outState.putString("titleText", titleText.getText().toString());
         outState.putString("descriptionText", descriptionText.getText().toString());
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        Bundle extras = intent.getExtras();
-        if (requestCode == 0){
-            if (resultCode == RESULT_OK) {
-                location = extras.getDoubleArray("location");
-                orientation = extras.getFloatArray("orientation");
-                photoPath = extras.getString("photoPath");
+        if (intent != null) {
+            Bundle extras = intent.getExtras();
+            if (requestCode == 0) {
+                if (resultCode == RESULT_OK) {
+                    location = extras.getDoubleArray("location");
+                    orientation = extras.getFloatArray("orientation");
+                    photoPath = extras.getString("photoPath");
 
-                photoView.setImageURI(Uri.parse(photoPath));
-            }
-        }
-
-         // Called after user presses the button from DuplicateDetectActivity
-        if (requestCode == 1) {
-            if (resultCode == Activity.RESULT_OK) {
-                // User pressed "yes": restart the current activity
-                recreate();
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                // User pressed "no": continue with the activity here
+                    photoView.setImageURI(Uri.parse(photoPath));
+                }
             }
         }
     }
@@ -164,10 +161,61 @@ public class CreateChallengeActivity extends AppCompatActivity implements ValueE
         startActivityForResult(intent, 0);
     }
 
-    public void submit(View view) {
-        // Check for duplicates before submitting the challenge
-        checkDuplicate();
+    // Define the ActivityResultLauncher
+    ActivityResultLauncher<Intent> duplicateDetectLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    // Handle the result of the DuplicateDetectActivity here
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        // Duplicate detected
+                        recreate();
+                    } else {
+                        // Duplicate not detected
+                        passCheck();
+                    }
+                }
+            });
 
+    /*
+     * Method to check duplicate and open duplicate detect activity
+     */
+    private void checkDuplicate() {
+        // Loop through each child node
+        for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+            // Retrieve the child's key and data
+            String childKey = childSnapshot.getKey();
+
+            // Location variables
+            double curLatitude =
+                    Double.parseDouble(childSnapshot.child("location").child("latitude").getValue().toString());
+            double curLongitude =
+                    Double.parseDouble(childSnapshot.child("location").child("longitude").getValue().toString());
+            // Calculate the distance between the current coordinates and the coordinates in the database
+            double distance = distance(location[0], location[1], curLatitude, curLongitude);
+            double LOCATION_THRESHOLD = 0.2;  // 200 meters -> Can modify
+
+            // Orientation variables
+            float curX = Float.parseFloat(childSnapshot.child("orientation").child("x").getValue().toString());
+            float curY = Float.parseFloat(childSnapshot.child("orientation").child("y").getValue().toString());
+            float curZ = Float.parseFloat(childSnapshot.child("orientation").child("z").getValue().toString());
+            float ANGLE_THRESHOLD = 60.0f; // 60 degrees -> Can modify
+            // Calculate the difference in orientation between the current and database values
+            double angleDiff = angleDiff(orientation, curX, curY, curZ);
+
+            // if duplicate suspected
+            if (distance < LOCATION_THRESHOLD && angleDiff < ANGLE_THRESHOLD) {
+                // Move to duplicate detect activity
+                Intent intent = new Intent(getApplicationContext(), DuplicateDetectActivity.class);
+                intent.putExtra("Duplicate Picture", childKey);
+                intent.putExtra("photoPath", photoPath);
+                duplicateDetectLauncher.launch(intent);
+                break;
+            }
+        }
+    }
+
+    private void passCheck() {
         Challenge c1 = new Challenge();
         c1.setId(UUID.randomUUID());
         c1.setCreatedAt(new Date());
@@ -186,15 +234,15 @@ public class CreateChallengeActivity extends AppCompatActivity implements ValueE
             Toast.makeText(this, "Upload successful", Toast.LENGTH_SHORT).show();
             try {
                 storageRef.getDownloadUrl().onSuccessTask(uri -> {
-                    c1.setImageURL(uri.toString());
-                    Map c1Map = new ObjectMapper().convertValue(c1, Map.class);
-                    mDatabase.child("challenges").child(c1.getId().toString()).setValue(c1Map);
-                    return null;
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to upload challenge", Toast.LENGTH_SHORT).show();
-                    return;
-                });
+                            c1.setImageURL(uri.toString());
+                            Map c1Map = new ObjectMapper().convertValue(c1, Map.class);
+                            mDatabase.child("challenges").child(c1.getId().toString()).setValue(c1Map);
+                            return null;
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(this, "Failed to upload challenge", Toast.LENGTH_SHORT).show();
+                            return;
+                        });
             } catch (Exception e) {
                 Toast.makeText(this, "Failed to upload challenge", Toast.LENGTH_SHORT).show();
                 return;
@@ -204,6 +252,11 @@ public class CreateChallengeActivity extends AppCompatActivity implements ValueE
         }).addOnFailureListener(e -> {
             Toast.makeText(this, "Upload failed", Toast.LENGTH_SHORT).show();
         });
+    }
+
+    public void submit(View view) {
+        // Check for duplicates before submitting the challenge
+        checkDuplicate();
     }
 
     // Calculate orientation diff
@@ -227,61 +280,5 @@ public class CreateChallengeActivity extends AppCompatActivity implements ValueE
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         double distance = R * c; // Distance in kilometers
         return distance;
-    }
-
-    /*
-     * Method to check duplicate and open duplicate detect activity
-     */
-    private void checkDuplicate() {
-        Log.d("checkDuplicate", "enter checkDuplicate");
-
-
-        // Loop through each child node
-        for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-            // Retrieve the child's key and data
-            String childKey = childSnapshot.getKey();
-
-            // Location variables
-            double curLatitude =
-                    Double.parseDouble(childSnapshot.child("location").child("latitude").getValue().toString());
-            double curLongitude =
-                    Double.parseDouble(childSnapshot.child("location").child("longitude").getValue().toString());
-            // Calculate the distance between the current coordinates and the coordinates in the database
-            double distance = distance(location[0], location[1], curLatitude, curLongitude);
-            double LOCATION_THRESHOLD = 0.2;  // 200 meters -> Can modify
-
-            // Orientation variables
-            float curX = Float.parseFloat(childSnapshot.child("orientation").child("x").getValue().toString());
-            float curY = Float.parseFloat(childSnapshot.child("orientation").child("y").getValue().toString());
-            float curZ = Float.parseFloat(childSnapshot.child("orientation").child("z").getValue().toString());
-            float ANGLE_THRESHOLD = 60.0f; // 60 degrees -> Can modify
-            // Calculate the difference in orientation between the current and database values
-            double angleDiff = angleDiff(orientation, curX, curY, curZ);
-
-            Log.d("checkDuplicate variable check latitude", Double.toString(curLatitude));
-            Log.d("checkDuplicate variable check longitude", Double.toString(curLongitude));
-
-            // if duplicate suspected
-            if (distance < LOCATION_THRESHOLD && angleDiff < ANGLE_THRESHOLD) {
-                Log.d("checkDuplicateConditionCheck", "duplicate suspected");
-                // Move to duplicate detect activity
-                Intent intent = new Intent(getApplicationContext(), DuplicateDetectActivity.class);
-                intent.putExtra("Duplicate Picture", childKey);
-                intent.putExtra("photoPath", photoPath);
-                startActivityForResult(intent, 1);
-                break;
-            }
-
-//                    if (Math.abs(location[0] - curLatitude) < 5 && Math.abs(location[1] - curLongitude) < 5 && Math.abs(curX - orientation[0]) < 5 && Math.abs(curY - orientation[1]) < 5 && Math.abs(curZ - orientation[2]) < 5) {
-//                        // Move to duplicate detect activity
-//                        Intent intent = new Intent(getApplicationContext(), DuplicateDetectActivity.class);
-//                        intent.putExtra("Duplicate Picture", childKey);
-//                        intent.putExtra("photoPath", photoPath);
-//                        startActivityForResult(intent, 1);
-//                    }
-//                }
-//            }
-//
-        }
     }
 }
