@@ -7,13 +7,12 @@
 
     <TextView
         android:id="@+id/duplicate_detect_textView1"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
         android:layout_marginTop="76dp"
         android:gravity="center"
         android:text="@string/duplicate_detect_may_exist"
-        android:textSize="25sp"
+        android:textSize="22sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -32,8 +31,7 @@
             android:layout_width="314dp"
             android:layout_height="225dp"
             android:layout_weight="1"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
+            android:rotation="90"
             app:srcCompat="@drawable/temp_img" />
 
         <ImageView
@@ -41,43 +39,50 @@
             android:layout_width="314dp"
             android:layout_height="225dp"
             android:layout_weight="1"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
+            android:rotation="90"
             app:srcCompat="@drawable/temp_img" />
     </LinearLayout>
 
     <TextView
         android:id="@+id/duplicate_detect_textView2"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginTop="68dp"
+        android:layout_marginTop="50dp"
         android:text="@string/duplicate_detect_question"
-        android:textSize="25sp"
+        android:gravity="center"
+        android:textSize="22sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
-    <Button
-        android:id="@+id/duplicate_detect_button_yes"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="100dp"
-        android:layout_marginTop="40dp"
-        android:text="Yes"
-        android:textSize="15sp"
+        android:layout_marginTop="20dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/duplicate_detect_textView2" />
+        app:layout_constraintTop_toBottomOf="@+id/duplicate_detect_textView2">
 
-    <Button
-        android:id="@+id/duplicate_detect_button_no"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="44dp"
-        android:layout_marginTop="40dp"
-        android:text="No"
-        android:textSize="15sp"
-        app:layout_constraintStart_toEndOf="@+id/duplicate_detect_button_yes"
-        app:layout_constraintTop_toBottomOf="@+id/duplicate_detect_textView2" />
+        <Button
+            android:id="@+id/duplicate_detect_button_yes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Yes"
+            android:textSize="15sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/duplicate_detect_textView2" />
+
+        <Button
+            android:id="@+id/duplicate_detect_button_no"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="44dp"
+            android:text="No"
+            android:textSize="15sp"
+            app:layout_constraintStart_toEndOf="@+id/duplicate_detect_button_yes"
+            app:layout_constraintTop_toBottomOf="@+id/duplicate_detect_textView2" />
+
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
