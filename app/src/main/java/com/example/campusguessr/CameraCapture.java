@@ -1,5 +1,6 @@
 package com.example.campusguessr;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Matrix;
@@ -10,6 +11,7 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.util.Rational;
 import android.util.Size;
 import android.view.Surface;
@@ -37,9 +39,18 @@ import androidx.lifecycle.LifecycleOwner;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
+import java.util.UUID;
 
 
 //source: https://codelabs.developers.google.com/codelabs/camerax-getting-started/
@@ -61,6 +72,12 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
     TextureView txView;
     TextView locationText;
     TextView orientationText;
+
+
+    // Duplicate detect fields
+    FirebaseDatabase database;
+    DatabaseReference dbRef;
+
 
     public CameraCapture() {
     }
@@ -113,7 +130,8 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
         Size screen = new Size(aspRatioW, aspRatioH); //size of the screen
 
         //config obj for preview/viewfinder thingy.
-        PreviewConfig pConfig = new PreviewConfig.Builder().setTargetAspectRatio(asp).setTargetResolution(screen).build();
+        PreviewConfig pConfig =
+                new PreviewConfig.Builder().setTargetAspectRatio(asp).setTargetResolution(screen).build();
         Preview preview = new Preview(pConfig); //lets build it
 
         preview.setOnPreviewOutputUpdateListener(
@@ -133,7 +151,8 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
         /* image capture */
 
         //config obj, selected capture mode
-        ImageCaptureConfig imgCapConfig = new ImageCaptureConfig.Builder().setCaptureMode(ImageCapture.CaptureMode.MIN_LATENCY)
+        ImageCaptureConfig imgCapConfig =
+                new ImageCaptureConfig.Builder().setCaptureMode(ImageCapture.CaptureMode.MIN_LATENCY)
                 .setTargetRotation(getWindowManager().getDefaultDisplay().getRotation()).build();
         final ImageCapture imgCap = new ImageCapture(imgCapConfig);
 
@@ -153,7 +172,7 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
                 float[] orientationValues = new float[3];
                 float[] rotationMatrix = new float[9];
                 SensorManager.getRotationMatrix(rotationMatrix, null, acc_event.values, mag_event.values);
-                SensorManager.getOrientation(rotationMatrix,orientationValues);
+                SensorManager.getOrientation(rotationMatrix, orientationValues);
                 // note: orientationValues[0] is azimuth, which is the "absolute heading of yaw"
                 // orientationValues[1] is pitch
                 // orientationValues[2] is roll
@@ -163,6 +182,7 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
 
                 /////// image capture ///////
                 File file = new File(getFilesDir() + "/" + System.currentTimeMillis() + ".jpg");
+
                 imgCap.takePicture(file, new ImageCapture.OnImageSavedListener() {
                     @Override
                     public void onImageSaved(@NonNull File file) {
@@ -179,7 +199,8 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
                     }
 
                     @Override
-                    public void onError(@NonNull ImageCapture.UseCaseError useCaseError, @NonNull String message, @Nullable Throwable cause) {
+                    public void onError(@NonNull ImageCapture.UseCaseError useCaseError, @NonNull String message,
+                                        @Nullable Throwable cause) {
                         String msg = "Photo capture failed: " + message;
                         Toast.makeText(getBaseContext(), msg, Toast.LENGTH_LONG).show();
                         if (cause != null) {
@@ -192,7 +213,8 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
 
         /* image analyser */
 
-        ImageAnalysisConfig imgAConfig = new ImageAnalysisConfig.Builder().setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE).build();
+        ImageAnalysisConfig imgAConfig =
+                new ImageAnalysisConfig.Builder().setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE).build();
         ImageAnalysis analysis = new ImageAnalysis(imgAConfig);
 
         analysis.setAnalyzer(
@@ -206,6 +228,8 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
         //bind to lifecycle:
         CameraX.bindToLifecycle((LifecycleOwner) this, analysis, imgCap, preview);
     }
+
+
 
     private void updateTransform() {
         /*
@@ -244,7 +268,8 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         //start camera when permissions have been granted otherwise exit app
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
@@ -277,7 +302,8 @@ public class CameraCapture extends AppCompatActivity implements SensorEventListe
         //            @Override
         //            public void onSuccess(Location location) {
         //                if (location != null) {
-        //                    lastCoords = Double.toString(location.getLatitude()) + ", " + Double.toString(location.getLongitude());
+        //                    lastCoords = Double.toString(location.getLatitude()) + ", " + Double.toString(location
+        //                    .getLongitude());
         //                }
         //            }
         //        });
